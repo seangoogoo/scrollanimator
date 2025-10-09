@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ScrollAnimator Usage Examples</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+			line-height: 1.6;
+			color: #333;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			min-height: 100vh;
+		}
+
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 40px 20px;
+		}
+
+		header {
+			text-align: center;
+			color: white;
+			padding: 60px 20px;
+			margin-bottom: 60px;
+		}
+
+		header h1 {
+			font-size: 3rem;
+			margin-bottom: 20px;
+			text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+		}
+
+		header p {
+			font-size: 1.2rem;
+			opacity: 0.9;
+		}
+
+		.section {
+			background: white;
+			border-radius: 12px;
+			padding: 40px;
+			margin-bottom: 40px;
+			box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+		}
+
+		.section h2 {
+			color: #667eea;
+			margin-bottom: 20px;
+			font-size: 2rem;
+		}
+
+		.section p {
+			margin-bottom: 15px;
+			font-size: 1.1rem;
+		}
+
+		.card {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			color: white;
+			padding: 30px;
+			border-radius: 8px;
+			margin-bottom: 20px;
+		}
+
+		.card h3 {
+			margin-bottom: 10px;
+			font-size: 1.5rem;
+		}
+
+		.grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+			gap: 30px;
+			margin-top: 30px;
+		}
+
+		.grid-item {
+			background: #f8f9fa;
+			padding: 30px;
+			border-radius: 8px;
+			border-left: 4px solid #667eea;
+		}
+
+		.grid-item h3 {
+			color: #667eea;
+			margin-bottom: 15px;
+		}
+
+		.image-section {
+			text-align: center;
+			padding: 60px 20px;
+		}
+
+		.image-placeholder {
+			width: 100%;
+			max-width: 600px;
+			height: 400px;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			border-radius: 12px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: white;
+			font-size: 2rem;
+			margin: 0 auto;
+		}
+
+		.controls {
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			background: white;
+			padding: 20px;
+			border-radius: 8px;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+			z-index: 1000;
+		}
+
+		.controls button {
+			display: block;
+			width: 100%;
+			padding: 10px 20px;
+			margin-bottom: 10px;
+			background: #667eea;
+			color: white;
+			border: none;
+			border-radius: 4px;
+			cursor: pointer;
+			font-size: 14px;
+			transition: background 0.3s;
+		}
+
+		.controls button:hover {
+			background: #5568d3;
+		}
+
+		.controls button:last-child {
+			margin-bottom: 0;
+		}
+
+		.status {
+			margin-top: 15px;
+			padding: 10px;
+			background: #f8f9fa;
+			border-radius: 4px;
+			font-size: 12px;
+		}
+
+		footer {
+			text-align: center;
+			color: white;
+			padding: 40px 20px;
+			margin-top: 60px;
+		}
+
+		/* Animation classes will be injected by ScrollAnimator */
+	</style>
+
+	<!-- Load ScrollAnimator -->
+	<script src="../scroll-animator.js"></script>
+
+	<!-- Initialize Examples -->
+	<script>
+		/*
+		 * INITIALIZATION PATTERNS DEMONSTRATION
+		 *
+		 * ScrollAnimator supports two initialization patterns:
+		 *
+		 * 1. AUTOMATIC INITIALIZATION (Recommended for most cases)
+		 *    - Simply create an instance
+		 *    - init() is called automatically on window.load event
+		 *    - Best for standard websites
+		 *
+		 * 2. MANUAL INITIALIZATION (Optional)
+		 *    - Create instance and call init() explicitly
+		 *    - Useful for immediate control, dynamic content, or SPA scenarios
+		 *    - Gives you control over initialization timing
+		 *
+		 * This demo shows BOTH patterns for educational purposes.
+		 */
+
+		// Store all animators for control panel
+		const animators = []
+
+		// ============================================================================
+		// AUTOMATIC INITIALIZATION EXAMPLES (No init() call)
+		// ============================================================================
+
+		// Example 1: Fade-in animation (AUTOMATIC INITIALIZATION)
+		// This instance will initialize automatically on window.load
+		const fadeAnimator = new ScrollAnimator({
+			mainClassName: 'fade-in',
+			customStyles: `
+				.fade-in {
+					opacity: 0;
+					transition: opacity 1s ease-out;
+				}
+				.fade-in.aos-visible {
+					opacity: 1;
+				}
+			`
+		})
+		// No init() call - will initialize automatically on window.load
+		animators.push(fadeAnimator)
+
+		// Example 2: Slide-up animation (AUTOMATIC INITIALIZATION)
+		// Demonstrates function-based customStyles with automatic initialization
+		const slideUpAnimator = new ScrollAnimator({
+			mainClassName: 'slide-up',
+			customStyles: ({ mainClassName }) => `
+				.${mainClassName} {
+					opacity: 0;
+					transform: translateY(50px);
+					transition: all 0.8s ease-out;
+				}
+				.${mainClassName}.aos-visible {
+					opacity: 1;
+					transform: translateY(0);
+				}
+			`
+		})
+		// No init() call - automatic initialization on window.load
+		animators.push(slideUpAnimator)
+
+		// ============================================================================
+		// MANUAL INITIALIZATION EXAMPLES (Explicit init() call)
+		// ============================================================================
+
+		// Example 3: Zoom-in animation (MANUAL INITIALIZATION)
+		// Manual init() for immediate control - useful for dynamic content or SPA scenarios
+		const zoomAnimator = new ScrollAnimator({
+			mainClassName: 'zoom-in',
+			customStyles: `
+				.zoom-in {
+					opacity: 0;
+					transform: scale(0.9);
+					transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+				}
+				.zoom-in.aos-visible {
+					opacity: 1;
+					transform: scale(1);
+				}
+			`
+		})
+		zoomAnimator.init() // Manual initialization for immediate control
+		animators.push(zoomAnimator)
+
+		// Example 4: Slide-left animation (MANUAL INITIALIZATION)
+		// Demonstrates manual init() for scenarios requiring explicit timing control
+		const slideLeftAnimator = new ScrollAnimator({
+			mainClassName: 'slide-left',
+			customStyles: `
+				.slide-left {
+					opacity: 0;
+					transform: translateX(-50px);
+					transition: all 0.7s ease-out;
+				}
+				.slide-left.aos-visible {
+					opacity: 1;
+					transform: translateX(0);
+				}
+			`
+		})
+		slideLeftAnimator.init() // Manual initialization before window.load
+		animators.push(slideLeftAnimator)
+
+		// ============================================================================
+		// CONTROL PANEL FUNCTIONALITY
+		// ============================================================================
+		// Wait for DOM to be ready before attaching control panel event listeners
+		window.addEventListener('DOMContentLoaded', () => {
+			// Get control panel elements
+			const pauseBtn = document.getElementById('pauseBtn')
+			const resumeBtn = document.getElementById('resumeBtn')
+			const refreshBtn = document.getElementById('refreshBtn')
+			const addElementBtn = document.getElementById('addElementBtn')
+			const statusSpan = document.getElementById('status')
+			const elementCountSpan = document.getElementById('elementCount')
+
+			// Update element count
+			const updateElementCount = () => {
+				const totalElements = animators.reduce((sum, animator) => {
+					return sum + animator.observedElements.length
+				}, 0)
+				elementCountSpan.textContent = totalElements
+			}
+
+			// Wait for window.load to update initial count (after automatic init completes)
+			window.addEventListener('load', () => {
+				updateElementCount()
+			})
+
+			// Pause button
+			pauseBtn.addEventListener('click', () => {
+				animators.forEach(animator => animator.pause())
+				statusSpan.textContent = 'Paused'
+				statusSpan.style.color = '#dc3545'
+			})
+
+			// Resume button
+			resumeBtn.addEventListener('click', () => {
+				animators.forEach(animator => animator.resume())
+				statusSpan.textContent = 'Active'
+				statusSpan.style.color = '#28a745'
+			})
+
+			// Refresh button
+			refreshBtn.addEventListener('click', () => {
+				animators.forEach(animator => animator.refresh())
+				updateElementCount()
+				alert('Animators refreshed! Element count updated.')
+			})
+
+			// Add element button
+			let elementCounter = 1
+			addElementBtn.addEventListener('click', () => {
+				const dynamicContent = document.getElementById('dynamicContent')
+
+				// Create new element
+				const newElement = document.createElement('div')
+				newElement.className = 'card fade-in'
+				newElement.innerHTML = `
+					<h3>Dynamic Element ${elementCounter}</h3>
+					<p>This element was added dynamically and will animate when scrolled into view.</p>
+				`
+
+				dynamicContent.appendChild(newElement)
+				elementCounter++
+
+				// Add to fade animator
+				fadeAnimator.addElements([newElement])
+				updateElementCount()
+
+				// Scroll to the new element
+				newElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+			})
+
+			console.log('Control panel initialized!')
+		})
+
+		// Cleanup on page unload
+		window.addEventListener('beforeunload', () => {
+			animators.forEach(animator => animator.destroy())
+		})
+
+		console.log('ScrollAnimator examples initialized!')
+		console.log('Total animators:', animators.length)
+		console.log('Use the control panel to interact with the animations')
+	</script>
+</head>
+<body>
+	<!-- Control Panel -->
+	<div class="controls">
+		<h3 style="margin-bottom: 15px; color: #667eea;">Controls</h3>
+		<button id="pauseBtn">⏸️ Pause Animations</button>
+		<button id="resumeBtn">▶️ Resume Animations</button>
+		<button id="refreshBtn">🔄 Refresh</button>
+		<button id="addElementBtn">➕ Add Element</button>
+		<div class="status">
+			<div>Status: <span id="status">Active</span></div>
+			<div>Elements: <span id="elementCount">0</span></div>
+		</div>
+	</div>
+
+	<!-- Header -->
+	<header class="fade-in">
+		<h1>ScrollAnimator Usage Examples</h1>
+		<p>Scroll down to see different animation patterns in action</p>
+	</header>
+
+	<div class="container">
+		<!-- Section 1: Basic Fade-In -->
+		<section class="section fade-in">
+			<h2>Example 1: Basic Fade-In Animation</h2>
+			<p>This section uses a simple fade-in animation with the default ScrollAnimator configuration.</p>
+			<p>The animation triggers when the element enters the viewport, creating a smooth appearance effect.</p>
+		</section>
+
+		<!-- Section 2: Slide-Up Animation -->
+		<section class="section slide-up">
+			<h2>Example 2: Slide-Up Animation</h2>
+			<p>This section slides up from below while fading in, creating a more dynamic entrance.</p>
+			<p>The slide-up effect is achieved using translateY transform combined with opacity transition.</p>
+		</section>
+
+		<!-- Section 3: Zoom-In Animation -->
+		<section class="section zoom-in">
+			<h2>Example 3: Zoom-In Animation</h2>
+			<p>This section starts small and scales up to full size, creating a zoom-in effect.</p>
+			<p>Perfect for drawing attention to important content or featured sections.</p>
+		</section>
+
+		<!-- Section 4: Cards with Stagger -->
+		<section class="section">
+			<h2>Example 4: Staggered Card Animations</h2>
+			<p>Multiple elements animate in sequence with a stagger delay:</p>
+			<div class="grid">
+				<div class="grid-item slide-left">
+					<h3>Card 1</h3>
+					<p>This card slides in from the left with a slight delay.</p>
+				</div>
+				<div class="grid-item slide-left">
+					<h3>Card 2</h3>
+					<p>This card follows with a staggered timing.</p>
+				</div>
+				<div class="grid-item slide-left">
+					<h3>Card 3</h3>
+					<p>The stagger effect creates a wave-like animation.</p>
+				</div>
+			</div>
+		</section>
+
+		<!-- Section 5: Image Placeholder -->
+		<section class="image-section">
+			<div class="image-placeholder zoom-in">
+				<span>Image Zoom Effect</span>
+			</div>
+		</section>
+
+		<!-- Section 6: Multiple Animation Types -->
+		<section class="section">
+			<h2 class="fade-in">Example 5: Mixed Animation Types</h2>
+			<div class="card slide-up">
+				<h3>Slide-Up Card</h3>
+				<p>This card uses a slide-up animation pattern.</p>
+			</div>
+			<div class="card zoom-in">
+				<h3>Zoom-In Card</h3>
+				<p>This card uses a zoom-in animation pattern.</p>
+			</div>
+			<div class="card slide-left">
+				<h3>Slide-Left Card</h3>
+				<p>This card uses a slide-left animation pattern.</p>
+			</div>
+		</section>
+
+		<!-- Section 7: Dynamic Content Area -->
+		<section class="section fade-in" id="dynamicSection">
+			<h2>Example 6: Dynamic Content</h2>
+			<p>Click the "Add Element" button in the control panel to dynamically add new animated elements below:</p>
+			<div id="dynamicContent" style="margin-top: 20px;">
+				<!-- Dynamic elements will be added here -->
+			</div>
+		</section>
+
+		<!-- Footer -->
+		<footer class="fade-in">
+			<p>ScrollAnimator - Smooth scroll animations made easy</p>
+			<p style="margin-top: 10px; opacity: 0.8;">Scroll back up to see the animations again!</p>
+		</footer>
+	</div>
+</body>
+</html>
+

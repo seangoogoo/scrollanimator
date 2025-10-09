@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Animate On Scroll</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Apply Outfit font by default */
+body {
+    font-family: 'Outfit', sans-serif;
+    /* Minimum height to allow scrolling and test observer */
+    min-height: 100vh;
+}
+</style>
+<script src="./scroll-animator.js?v=1.0.0"></script>
+<script>
+const animator = new ScrollAnimator({ debug: true })
+// console.log(animator._boundHandlers)
+// animator.init()
+// console.log(ScrollAnimator.clamp(150, 0, 100)) // 100
+// console.log(ScrollAnimator.lerp(0, 100, 0.5))  // 50
+// console.log(ScrollAnimator.invLerp(0, 100, 50)) // 0.5
+</script>
+</head>
+<body class="bg-gray-100">
+<div class="container mx-auto overflow-clip p-6 sm:p-8">
+
+    <h1 class="text-2xl sm:text-3xl font-bold text-center mb-8 text-gray-800 animate-on-scroll">On Scroll Animation depending on scroll speed</h1>
+
+<!-- Test Content Sections -->
+    <div class="max-w-4xl mx-auto mb-8 bg-white p-6 rounded-lg shadow">
+
+        <!-- Section 1: Hero Section with Image and CTA -->
+        <section class="mb-12">
+            <div class="flex flex-col md:flex-row gap-6 items-center">
+                <div class="md:w-1/2">
+                    <h2 class="text-4xl font-bold text-gray-900 mb-4 animate-on-scroll">Transform Your Digital Experience</h2>
+                    <p class="text-lg text-gray-600 mb-6 animate-on-scroll">Discover innovative solutions that empower your business to reach new heights. Our cutting-edge technology adapts to your needs.</p>
+                    <button class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition animate-on-scroll">Get Started Today</button>
+                </div>
+                <div class="md:w-1/2 animate-on-scroll">
+                    <img src="https://picsum.photos/600/400?random=1" alt="Hero" class="rounded-lg shadow-lg w-full">
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Three Column Feature Grid -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-8 animate-on-scroll">Why Choose Us</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center p-6 animate-on-scroll">
+                    <img src="https://picsum.photos/120/120?random=2" alt="Fast" class="mx-auto mb-4 rounded-full">
+                    <h3 class="text-xl font-semibold mb-3">Lightning Fast</h3>
+                    <p class="text-gray-600">Experience blazing speed with our optimized infrastructure designed for performance.</p>
+                </div>
+                <div class="text-center p-6 animate-on-scroll">
+                    <img src="https://picsum.photos/120/120?random=3" alt="Secure" class="mx-auto mb-4 rounded-full">
+                    <h3 class="text-xl font-semibold mb-3">Bank-Level Security</h3>
+                    <p class="text-gray-600">Your data is protected with enterprise-grade encryption and security protocols.</p>
+                </div>
+                <div class="text-center p-6 animate-on-scroll">
+                    <img src="https://picsum.photos/120/120?random=4" alt="Support" class="mx-auto mb-4 rounded-full">
+                    <h3 class="text-xl font-semibold mb-3">24/7 Support</h3>
+                    <p class="text-gray-600">Our dedicated team is always available to help you succeed at any time.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Single Column Testimonial -->
+        <section class="mb-12 animate-on-scroll">
+            <div class="bg-gradient-to-r from-purple-500 to-pink-500 p-8 rounded-xl text-white">
+                <blockquote class="text-2xl font-medium mb-4 animate-on-scroll">"This platform has completely revolutionized how we work. The results speak for themselves - we've seen a 300% increase in productivity."</blockquote>
+                <div class="flex items-center gap-4 animate-on-scroll">
+                    <img src="https://picsum.photos/60/60?random=5" alt="John Doe" class="rounded-full">
+                    <div>
+                        <p class="font-semibold">John Doe</p>
+                        <p class="text-purple-100">CEO, TechCorp Industries</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Two Column Image + Text -->
+        <section class="mb-12">
+            <div class="flex flex-col md:flex-row-reverse gap-8 items-center">
+                <div class="md:w-1/2 animate-on-scroll">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Powerful Analytics Dashboard</h2>
+                    <p class="text-gray-600 mb-4">Track every metric that matters with our comprehensive analytics suite. Make data-driven decisions with confidence.</p>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex items-center animate-on-scroll"><span class="text-green-500 mr-2">✓</span> Real-time data visualization</li>
+                        <li class="flex items-center animate-on-scroll"><span class="text-green-500 mr-2">✓</span> Custom report generation</li>
+                        <li class="flex items-center animate-on-scroll"><span class="text-green-500 mr-2">✓</span> Predictive insights powered by AI</li>
+                    </ul>
+                </div>
+                <div class="md:w-1/2 animate-on-scroll">
+                    <img src="https://picsum.photos/550/400?random=6" alt="Analytics" class="rounded-lg shadow-xl w-full">
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Four Column Stats -->
+        <section class="mb-12">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div class="p-6 bg-blue-50 rounded-lg animate-on-scroll">
+                    <h3 class="text-4xl font-bold text-blue-600 mb-2">50K+</h3>
+                    <p class="text-gray-600">Active Users</p>
+                </div>
+                <div class="p-6 bg-green-50 rounded-lg animate-on-scroll">
+                    <h3 class="text-4xl font-bold text-green-600 mb-2">99.9%</h3>
+                    <p class="text-gray-600">Uptime</p>
+                </div>
+                <div class="p-6 bg-purple-50 rounded-lg animate-on-scroll">
+                    <h3 class="text-4xl font-bold text-purple-600 mb-2">150+</h3>
+                    <p class="text-gray-600">Countries</p>
+                </div>
+                <div class="p-6 bg-orange-50 rounded-lg animate-on-scroll">
+                    <h3 class="text-4xl font-bold text-orange-600 mb-2">4.9/5</h3>
+                    <p class="text-gray-600">Rating</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Single Column with Multiple Images -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-8 animate-on-scroll">Trusted by Industry Leaders</h2>
+            <div class="flex flex-wrap justify-center items-center gap-8 grayscale opacity-60">
+                <div class="animate-on-scroll"><img src="https://picsum.photos/150/60?random=7" alt="Company 1"></div>
+                <div class="animate-on-scroll"><img src="https://picsum.photos/150/60?random=8" alt="Company 2"></div>
+                <div class="animate-on-scroll"><img src="https://picsum.photos/150/60?random=9" alt="Company 3"></div>
+                <div class="animate-on-scroll"><img src="https://picsum.photos/150/60?random=10" alt="Company 4"></div>
+                <div class="animate-on-scroll"><img src="https://picsum.photos/150/60?random=11" alt="Company 5"></div>
+            </div>
+        </section>
+
+        <!-- Section 7: Three Column Pricing Cards -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-8 animate-on-scroll">Simple, Transparent Pricing</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="border-2 border-gray-200 rounded-xl p-6 hover:border-blue-500 transition animate-on-scroll">
+                    <h3 class="text-xl font-bold mb-2">Starter</h3>
+                    <p class="text-4xl font-bold text-gray-900 mb-4">$29<span class="text-lg text-gray-500">/mo</span></p>
+                    <ul class="space-y-3 mb-6 text-gray-600">
+                        <li>✓ Up to 10 projects</li>
+                        <li>✓ 5GB storage</li>
+                        <li>✓ Email support</li>
+                    </ul>
+                    <button class="w-full bg-gray-100 text-gray-900 py-2 rounded-lg font-semibold hover:bg-gray-200 transition">Choose Plan</button>
+                </div>
+                <div class="border-2 border-blue-500 rounded-xl p-6 relative animate-on-scroll">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">Popular</div>
+                    <h3 class="text-xl font-bold mb-2">Professional</h3>
+                    <p class="text-4xl font-bold text-gray-900 mb-4">$79<span class="text-lg text-gray-500">/mo</span></p>
+                    <ul class="space-y-3 mb-6 text-gray-600">
+                        <li>✓ Unlimited projects</li>
+                        <li>✓ 50GB storage</li>
+                        <li>✓ Priority support</li>
+                        <li>✓ Advanced analytics</li>
+                    </ul>
+                    <button class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition">Choose Plan</button>
+                </div>
+                <div class="border-2 border-gray-200 rounded-xl p-6 hover:border-blue-500 transition animate-on-scroll">
+                    <h3 class="text-xl font-bold mb-2">Enterprise</h3>
+                    <p class="text-4xl font-bold text-gray-900 mb-4">$199<span class="text-lg text-gray-500">/mo</span></p>
+                    <ul class="space-y-3 mb-6 text-gray-600">
+                        <li>✓ Everything in Pro</li>
+                        <li>✓ Unlimited storage</li>
+                        <li>✓ 24/7 phone support</li>
+                        <li>✓ Custom integrations</li>
+                    </ul>
+                    <button class="w-full bg-gray-100 text-gray-900 py-2 rounded-lg font-semibold hover:bg-gray-200 transition">Choose Plan</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 8: Two Column Feature Comparison -->
+        <section class="mb-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="animate-on-scroll">
+                    <img src="https://picsum.photos/500/350?random=12" alt="Before" class="rounded-lg shadow-lg w-full mb-4">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Before Our Solution</h3>
+                    <p class="text-gray-600">Manual processes, scattered data, and countless hours wasted on repetitive tasks that drain your team's productivity.</p>
+                </div>
+                <div class="animate-on-scroll">
+                    <img src="https://picsum.photos/500/350?random=13" alt="After" class="rounded-lg shadow-lg w-full mb-4">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">After Our Solution</h3>
+                    <p class="text-gray-600">Automated workflows, centralized intelligence, and your team focused on what truly matters - growing your business.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 9: Single Column FAQ -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-8 animate-on-scroll">Frequently Asked Questions</h2>
+            <div class="space-y-4">
+                <div class="bg-gray-50 p-6 rounded-lg animate-on-scroll">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">How quickly can I get started?</h4>
+                    <p class="text-gray-600">You can be up and running in less than 5 minutes. Our intuitive onboarding process guides you through every step.</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-lg animate-on-scroll">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Can I cancel anytime?</h4>
+                    <p class="text-gray-600">Absolutely! There are no long-term contracts. Cancel your subscription at any time with just one click.</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-lg animate-on-scroll">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Do you offer a free trial?</h4>
+                    <p class="text-gray-600">Yes! Try our Professional plan free for 14 days. No credit card required to start your trial.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 10: CTA Section with Background -->
+        <section class="mb-12 animate-on-scroll">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-12 text-center text-white relative overflow-hidden">
+                <div class="relative z-10">
+                    <h2 class="text-4xl font-bold mb-4 animate-on-scroll">Ready to Transform Your Workflow?</h2>
+                    <p class="text-xl mb-8 text-blue-100 animate-on-scroll">Join thousands of satisfied customers who have already made the switch.</p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center animate-on-scroll">
+                        <button class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">Start Free Trial</button>
+                        <button class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition">Schedule Demo</button>
+                    </div>
+                </div>
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-32 -mt-32"></div>
+                <div class="absolute bottom-0 left-0 w-48 h-48 bg-white opacity-5 rounded-full -ml-24 -mb-24"></div>
+            </div>
+        </section>
+
+        <!-- Section 1: Hero Section with Image and CTA -->
+        <section class="mb-12">
+            <div class="flex flex-col md:flex-row gap-6 items-center">
+                <div class="md:w-1/2">
+                    <h2 class="text-4xl font-bold text-gray-900 mb-4 animate-on-scroll">Transform Your Digital Experience</h2>
+                    <p class="text-lg text-gray-600 mb-6 animate-on-scroll">Discover innovative solutions that empower your business to reach new heights. Our cutting-edge technology adapts to your needs.</p>
+                    <button class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition animate-on-scroll">Get Started Today</button>
+                </div>
+                <div class="md:w-1/2 animate-on-scroll">
+                    <img src="https://picsum.photos/600/400?random=1" alt="Hero" class="rounded-lg shadow-lg w-full">
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Three Column Feature Grid -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-8 animate-on-scroll">Why Choose Us</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center p-6 animate-on-scroll">
+                    <img src="https://picsum.photos/120/120?random=2" alt="Fast" class="mx-auto mb-4 rounded-full">
+                    <h3 class="text-xl font-semibold mb-3">Lightning Fast</h3>
+                    <p class="text-gray-600">Experience blazing speed with our optimized infrastructure designed for performance.</p>
+                </div>
+                <div class="text-center p-6 animate-on-scroll">
+                    <img src="https://picsum.photos/120/120?random=3" alt="Secure" class="mx-auto mb-4 rounded-full">
+                    <h3 class="text-xl font-semibold mb-3">Bank-Level Security</h3>
+                    <p class="text-gray-600">Your data is protected with enterprise-grade encryption and security protocols.</p>
+                </div>
+                <div class="text-center p-6 animate-on-scroll">
+                    <img src="https://picsum.photos/120/120?random=4" alt="Support" class="mx-auto mb-4 rounded-full">
+                    <h3 class="text-xl font-semibold mb-3">24/7 Support</h3>
+                    <p class="text-gray-600">Our dedicated team is always available to help you succeed at any time.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Single Column Testimonial -->
+        <section class="mb-12 animate-on-scroll">
+            <div class="bg-gradient-to-r from-purple-500 to-pink-500 p-8 rounded-xl text-white">
+                <blockquote class="text-2xl font-medium mb-4 animate-on-scroll">"This platform has completely revolutionized how we work. The results speak for themselves - we've seen a 300% increase in productivity."</blockquote>
+                <div class="flex items-center gap-4 animate-on-scroll">
+                    <img src="https://picsum.photos/60/60?random=5" alt="John Doe" class="rounded-full">
+                    <div>
+                        <p class="font-semibold">John Doe</p>
+                        <p class="text-purple-100">CEO, TechCorp Industries</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Two Column Image + Text -->
+        <section class="mb-12">
+            <div class="flex flex-col md:flex-row-reverse gap-8 items-center">
+                <div class="md:w-1/2 animate-on-scroll">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Powerful Analytics Dashboard</h2>
+                    <p class="text-gray-600 mb-4">Track every metric that matters with our comprehensive analytics suite. Make data-driven decisions with confidence.</p>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex items-center animate-on-scroll"><span class="text-green-500 mr-2">✓</span> Real-time data visualization</li>
+                        <li class="flex items-center animate-on-scroll"><span class="text-green-500 mr-2">✓</span> Custom report generation</li>
+                        <li class="flex items-center animate-on-scroll"><span class="text-green-500 mr-2">✓</span> Predictive insights powered by AI</li>
+                    </ul>
+                </div>
+                <div class="md:w-1/2 animate-on-scroll">
+                    <img src="https://picsum.photos/550/400?random=6" alt="Analytics" class="rounded-lg shadow-xl w-full">
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Four Column Stats -->
+        <section class="mb-12">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div class="p-6 bg-blue-50 rounded-lg animate-on-scroll">
+                    <h3 class="text-4xl font-bold text-blue-600 mb-2">50K+</h3>
+                    <p class="text-gray-600">Active Users</p>
+                </div>
+                <div class="p-6 bg-green-50 rounded-lg animate-on-scroll">
+                    <h3 class="text-4xl font-bold text-green-600 mb-2">99.9%</h3>
+                    <p class="text-gray-600">Uptime</p>
+                </div>
+                <div class="p-6 bg-purple-50 rounded-lg animate-on-scroll">
+                    <h3 class="text-4xl font-bold text-purple-600 mb-2">150+</h3>
+                    <p class="text-gray-600">Countries</p>
+                </div>
+                <div class="p-6 bg-orange-50 rounded-lg animate-on-scroll">
+                    <h3 class="text-4xl font-bold text-orange-600 mb-2">4.9/5</h3>
+                    <p class="text-gray-600">Rating</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Single Column with Multiple Images -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-8 animate-on-scroll">Trusted by Industry Leaders</h2>
+            <div class="flex flex-wrap justify-center items-center gap-8 grayscale opacity-60">
+                <div class="animate-on-scroll"><img src="https://picsum.photos/150/60?random=7" alt="Company 1"></div>
+                <div class="animate-on-scroll"><img src="https://picsum.photos/150/60?random=8" alt="Company 2"></div>
+                <div class="animate-on-scroll"><img src="https://picsum.photos/150/60?random=9" alt="Company 3"></div>
+                <div class="animate-on-scroll"><img src="https://picsum.photos/150/60?random=10" alt="Company 4"></div>
+                <div class="animate-on-scroll"><img src="https://picsum.photos/150/60?random=11" alt="Company 5"></div>
+            </div>
+        </section>
+
+        <!-- Section 7: Three Column Pricing Cards -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-8 animate-on-scroll">Simple, Transparent Pricing</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="border-2 border-gray-200 rounded-xl p-6 hover:border-blue-500 transition animate-on-scroll">
+                    <h3 class="text-xl font-bold mb-2">Starter</h3>
+                    <p class="text-4xl font-bold text-gray-900 mb-4">$29<span class="text-lg text-gray-500">/mo</span></p>
+                    <ul class="space-y-3 mb-6 text-gray-600">
+                        <li>✓ Up to 10 projects</li>
+                        <li>✓ 5GB storage</li>
+                        <li>✓ Email support</li>
+                    </ul>
+                    <button class="w-full bg-gray-100 text-gray-900 py-2 rounded-lg font-semibold hover:bg-gray-200 transition">Choose Plan</button>
+                </div>
+                <div class="border-2 border-blue-500 rounded-xl p-6 relative animate-on-scroll">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">Popular</div>
+                    <h3 class="text-xl font-bold mb-2">Professional</h3>
+                    <p class="text-4xl font-bold text-gray-900 mb-4">$79<span class="text-lg text-gray-500">/mo</span></p>
+                    <ul class="space-y-3 mb-6 text-gray-600">
+                        <li>✓ Unlimited projects</li>
+                        <li>✓ 50GB storage</li>
+                        <li>✓ Priority support</li>
+                        <li>✓ Advanced analytics</li>
+                    </ul>
+                    <button class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition">Choose Plan</button>
+                </div>
+                <div class="border-2 border-gray-200 rounded-xl p-6 hover:border-blue-500 transition animate-on-scroll">
+                    <h3 class="text-xl font-bold mb-2">Enterprise</h3>
+                    <p class="text-4xl font-bold text-gray-900 mb-4">$199<span class="text-lg text-gray-500">/mo</span></p>
+                    <ul class="space-y-3 mb-6 text-gray-600">
+                        <li>✓ Everything in Pro</li>
+                        <li>✓ Unlimited storage</li>
+                        <li>✓ 24/7 phone support</li>
+                        <li>✓ Custom integrations</li>
+                    </ul>
+                    <button class="w-full bg-gray-100 text-gray-900 py-2 rounded-lg font-semibold hover:bg-gray-200 transition">Choose Plan</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 8: Two Column Feature Comparison -->
+        <section class="mb-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="animate-on-scroll">
+                    <img src="https://picsum.photos/500/350?random=12" alt="Before" class="rounded-lg shadow-lg w-full mb-4">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Before Our Solution</h3>
+                    <p class="text-gray-600">Manual processes, scattered data, and countless hours wasted on repetitive tasks that drain your team's productivity.</p>
+                </div>
+                <div class="animate-on-scroll">
+                    <img src="https://picsum.photos/500/350?random=13" alt="After" class="rounded-lg shadow-lg w-full mb-4">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">After Our Solution</h3>
+                    <p class="text-gray-600">Automated workflows, centralized intelligence, and your team focused on what truly matters - growing your business.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 9: Single Column FAQ -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-8 animate-on-scroll">Frequently Asked Questions</h2>
+            <div class="space-y-4">
+                <div class="bg-gray-50 p-6 rounded-lg animate-on-scroll">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">How quickly can I get started?</h4>
+                    <p class="text-gray-600">You can be up and running in less than 5 minutes. Our intuitive onboarding process guides you through every step.</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-lg animate-on-scroll">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Can I cancel anytime?</h4>
+                    <p class="text-gray-600">Absolutely! There are no long-term contracts. Cancel your subscription at any time with just one click.</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-lg animate-on-scroll">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Do you offer a free trial?</h4>
+                    <p class="text-gray-600">Yes! Try our Professional plan free for 14 days. No credit card required to start your trial.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 10: CTA Section with Background -->
+        <section class="mb-12 animate-on-scroll">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-12 text-center text-white relative overflow-hidden">
+                <div class="relative z-10">
+                    <h2 class="text-4xl font-bold mb-4 animate-on-scroll">Ready to Transform Your Workflow?</h2>
+                    <p class="text-xl mb-8 text-blue-100 animate-on-scroll">Join thousands of satisfied customers who have already made the switch.</p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center animate-on-scroll">
+                        <button class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">Start Free Trial</button>
+                        <button class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition">Schedule Demo</button>
+                    </div>
+                </div>
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-32 -mt-32"></div>
+                <div class="absolute bottom-0 left-0 w-48 h-48 bg-white opacity-5 rounded-full -ml-24 -mb-24"></div>
+            </div>
+        </section>
+
+        <!-- Section 1: Hero Section with Image and CTA -->
+        <section class="mb-12">
+            <div class="flex flex-col md:flex-row gap-6 items-center">
+                <div class="md:w-1/2">
+                    <h2 class="text-4xl font-bold text-gray-900 mb-4 animate-on-scroll">Transform Your Digital Experience</h2>
+                    <p class="text-lg text-gray-600 mb-6 animate-on-scroll">Discover innovative solutions that empower your business to reach new heights. Our cutting-edge technology adapts to your needs.</p>
+                    <button class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition animate-on-scroll">Get Started Today</button>
+                </div>
+                <div class="md:w-1/2 animate-on-scroll">
+                    <img src="https://picsum.photos/600/400?random=1" alt="Hero" class="rounded-lg shadow-lg w-full">
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Three Column Feature Grid -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-8 animate-on-scroll">Why Choose Us</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center p-6 animate-on-scroll">
+                    <img src="https://picsum.photos/120/120?random=2" alt="Fast" class="mx-auto mb-4 rounded-full">
+                    <h3 class="text-xl font-semibold mb-3">Lightning Fast</h3>
+                    <p class="text-gray-600">Experience blazing speed with our optimized infrastructure designed for performance.</p>
+                </div>
+                <div class="text-center p-6 animate-on-scroll">
+                    <img src="https://picsum.photos/120/120?random=3" alt="Secure" class="mx-auto mb-4 rounded-full">
+                    <h3 class="text-xl font-semibold mb-3">Bank-Level Security</h3>
+                    <p class="text-gray-600">Your data is protected with enterprise-grade encryption and security protocols.</p>
+                </div>
+                <div class="text-center p-6 animate-on-scroll">
+                    <img src="https://picsum.photos/120/120?random=4" alt="Support" class="mx-auto mb-4 rounded-full">
+                    <h3 class="text-xl font-semibold mb-3">24/7 Support</h3>
+                    <p class="text-gray-600">Our dedicated team is always available to help you succeed at any time.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Single Column Testimonial -->
+        <section class="mb-12 animate-on-scroll">
+            <div class="bg-gradient-to-r from-purple-500 to-pink-500 p-8 rounded-xl text-white">
+                <blockquote class="text-2xl font-medium mb-4 animate-on-scroll">"This platform has completely revolutionized how we work. The results speak for themselves - we've seen a 300% increase in productivity."</blockquote>
+                <div class="flex items-center gap-4 animate-on-scroll">
+                    <img src="https://picsum.photos/60/60?random=5" alt="John Doe" class="rounded-full">
+                    <div>
+                        <p class="font-semibold">John Doe</p>
+                        <p class="text-purple-100">CEO, TechCorp Industries</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Two Column Image + Text -->
+        <section class="mb-12">
+            <div class="flex flex-col md:flex-row-reverse gap-8 items-center">
+                <div class="md:w-1/2 animate-on-scroll">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-4">Powerful Analytics Dashboard</h2>
+                    <p class="text-gray-600 mb-4">Track every metric that matters with our comprehensive analytics suite. Make data-driven decisions with confidence.</p>
+                    <ul class="space-y-2 text-gray-700">
+                        <li class="flex items-center animate-on-scroll"><span class="text-green-500 mr-2">✓</span> Real-time data visualization</li>
+                        <li class="flex items-center animate-on-scroll"><span class="text-green-500 mr-2">✓</span> Custom report generation</li>
+                        <li class="flex items-center animate-on-scroll"><span class="text-green-500 mr-2">✓</span> Predictive insights powered by AI</li>
+                    </ul>
+                </div>
+                <div class="md:w-1/2 animate-on-scroll">
+                    <img src="https://picsum.photos/550/400?random=6" alt="Analytics" class="rounded-lg shadow-xl w-full">
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Four Column Stats -->
+        <section class="mb-12">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div class="p-6 bg-blue-50 rounded-lg animate-on-scroll">
+                    <h3 class="text-4xl font-bold text-blue-600 mb-2">50K+</h3>
+                    <p class="text-gray-600">Active Users</p>
+                </div>
+                <div class="p-6 bg-green-50 rounded-lg animate-on-scroll">
+                    <h3 class="text-4xl font-bold text-green-600 mb-2">99.9%</h3>
+                    <p class="text-gray-600">Uptime</p>
+                </div>
+                <div class="p-6 bg-purple-50 rounded-lg animate-on-scroll">
+                    <h3 class="text-4xl font-bold text-purple-600 mb-2">150+</h3>
+                    <p class="text-gray-600">Countries</p>
+                </div>
+                <div class="p-6 bg-orange-50 rounded-lg animate-on-scroll">
+                    <h3 class="text-4xl font-bold text-orange-600 mb-2">4.9/5</h3>
+                    <p class="text-gray-600">Rating</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Single Column with Multiple Images -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-8 animate-on-scroll">Trusted by Industry Leaders</h2>
+            <div class="flex flex-wrap justify-center items-center gap-8 grayscale opacity-60">
+                <div class="animate-on-scroll"><img src="https://picsum.photos/150/60?random=7" alt="Company 1"></div>
+                <div class="animate-on-scroll"><img src="https://picsum.photos/150/60?random=8" alt="Company 2"></div>
+                <div class="animate-on-scroll"><img src="https://picsum.photos/150/60?random=9" alt="Company 3"></div>
+                <div class="animate-on-scroll"><img src="https://picsum.photos/150/60?random=10" alt="Company 4"></div>
+                <div class="animate-on-scroll"><img src="https://picsum.photos/150/60?random=11" alt="Company 5"></div>
+            </div>
+        </section>
+
+        <!-- Section 7: Three Column Pricing Cards -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-8 animate-on-scroll">Simple, Transparent Pricing</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="border-2 border-gray-200 rounded-xl p-6 hover:border-blue-500 transition animate-on-scroll">
+                    <h3 class="text-xl font-bold mb-2">Starter</h3>
+                    <p class="text-4xl font-bold text-gray-900 mb-4">$29<span class="text-lg text-gray-500">/mo</span></p>
+                    <ul class="space-y-3 mb-6 text-gray-600">
+                        <li>✓ Up to 10 projects</li>
+                        <li>✓ 5GB storage</li>
+                        <li>✓ Email support</li>
+                    </ul>
+                    <button class="w-full bg-gray-100 text-gray-900 py-2 rounded-lg font-semibold hover:bg-gray-200 transition">Choose Plan</button>
+                </div>
+                <div class="border-2 border-blue-500 rounded-xl p-6 relative animate-on-scroll">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white px-4 py-1 rounded-full text-sm font-semibold">Popular</div>
+                    <h3 class="text-xl font-bold mb-2">Professional</h3>
+                    <p class="text-4xl font-bold text-gray-900 mb-4">$79<span class="text-lg text-gray-500">/mo</span></p>
+                    <ul class="space-y-3 mb-6 text-gray-600">
+                        <li>✓ Unlimited projects</li>
+                        <li>✓ 50GB storage</li>
+                        <li>✓ Priority support</li>
+                        <li>✓ Advanced analytics</li>
+                    </ul>
+                    <button class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition">Choose Plan</button>
+                </div>
+                <div class="border-2 border-gray-200 rounded-xl p-6 hover:border-blue-500 transition animate-on-scroll">
+                    <h3 class="text-xl font-bold mb-2">Enterprise</h3>
+                    <p class="text-4xl font-bold text-gray-900 mb-4">$199<span class="text-lg text-gray-500">/mo</span></p>
+                    <ul class="space-y-3 mb-6 text-gray-600">
+                        <li>✓ Everything in Pro</li>
+                        <li>✓ Unlimited storage</li>
+                        <li>✓ 24/7 phone support</li>
+                        <li>✓ Custom integrations</li>
+                    </ul>
+                    <button class="w-full bg-gray-100 text-gray-900 py-2 rounded-lg font-semibold hover:bg-gray-200 transition">Choose Plan</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 8: Two Column Feature Comparison -->
+        <section class="mb-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="animate-on-scroll">
+                    <img src="https://picsum.photos/500/350?random=12" alt="Before" class="rounded-lg shadow-lg w-full mb-4">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">Before Our Solution</h3>
+                    <p class="text-gray-600">Manual processes, scattered data, and countless hours wasted on repetitive tasks that drain your team's productivity.</p>
+                </div>
+                <div class="animate-on-scroll">
+                    <img src="https://picsum.photos/500/350?random=13" alt="After" class="rounded-lg shadow-lg w-full mb-4">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-2">After Our Solution</h3>
+                    <p class="text-gray-600">Automated workflows, centralized intelligence, and your team focused on what truly matters - growing your business.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 9: Single Column FAQ -->
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-8 animate-on-scroll">Frequently Asked Questions</h2>
+            <div class="space-y-4">
+                <div class="bg-gray-50 p-6 rounded-lg animate-on-scroll">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">How quickly can I get started?</h4>
+                    <p class="text-gray-600">You can be up and running in less than 5 minutes. Our intuitive onboarding process guides you through every step.</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-lg animate-on-scroll">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Can I cancel anytime?</h4>
+                    <p class="text-gray-600">Absolutely! There are no long-term contracts. Cancel your subscription at any time with just one click.</p>
+                </div>
+                <div class="bg-gray-50 p-6 rounded-lg animate-on-scroll">
+                    <h4 class="text-lg font-semibold text-gray-900 mb-2">Do you offer a free trial?</h4>
+                    <p class="text-gray-600">Yes! Try our Professional plan free for 14 days. No credit card required to start your trial.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 10: CTA Section with Background -->
+        <section class="mb-12 animate-on-scroll">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-12 text-center text-white relative overflow-hidden">
+                <div class="relative z-10">
+                    <h2 class="text-4xl font-bold mb-4 animate-on-scroll">Ready to Transform Your Workflow?</h2>
+                    <p class="text-xl mb-8 text-blue-100 animate-on-scroll">Join thousands of satisfied customers who have already made the switch.</p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center animate-on-scroll">
+                        <button class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">Start Free Trial</button>
+                        <button class="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition">Schedule Demo</button>
+                    </div>
+                </div>
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-32 -mt-32"></div>
+                <div class="absolute bottom-0 left-0 w-48 h-48 bg-white opacity-5 rounded-full -ml-24 -mb-24"></div>
+            </div>
+        </section>
+
+    </div>
+
+</div>
+</body>
+</html>
