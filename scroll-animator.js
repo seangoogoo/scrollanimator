@@ -1,3 +1,12 @@
+/**
+ * ScrollAnimator - Speed Adaptive Scroll Animation
+ *
+ * @author Jensen SIU
+ * @website https://www.jensen-siu.net
+ * @version 1.0.0
+ * @license MIT
+ */
+
 'use strict'
 
 /**
@@ -78,23 +87,6 @@ class ScrollAnimator {
 	 *     }
 	 *   `
 	 * })
-	 * // translateYvalue auto-set to 0
-	 *
-	 * @example
-	 * // String-based custom CSS
-	 * const fadeAnimator = new ScrollAnimator({
-	 *   mainClassName: 'fade-in',
-	 *   customStyles: `
-	 *     .fade-in {
-	 *       opacity: 0;
-	 *       transition: opacity 0.5s ease;
-	 *     }
-	 *     .fade-in.aos-visible {
-	 *       opacity: 1;
-	 *     }
-	 *   `
-	 * })
-	 * // translateYvalue auto-set to 0
 	 *
 	 * @example
 	 * // External CSS (no injection)
@@ -103,71 +95,6 @@ class ScrollAnimator {
 	 *   visibleClassName: 'visible',
 	 *   customStyles: 'external'
 	 * })
-	 * // Assumes .my-animation and .my-animation.visible exist in your CSS
-	 * // translateYvalue auto-set to 0
-	 *
-	 * @example
-	 * // Override auto-adjustment with explicit translateYvalue
-	 * const slideAnimator = new ScrollAnimator({
-	 *   mainClassName: 'slide-up',
-	 *   translateYvalue: 50, // Explicitly set (not auto-adjusted)
-	 *   customStyles: ({ mainClassName, visibleClassName, translateYvalue }) => `
-	 *     .${mainClassName} {
-	 *       opacity: 0;
-	 *       transform: translateY(${translateYvalue}px);
-	 *       transition: all 0.6s ease;
-	 *     }
-	 *     .${mainClassName}.${visibleClassName} {
-	 *       opacity: 1;
-	 *       transform: translateY(0);
-	 *     }
-	 *   `
-	 * })
-	 * // translateYvalue stays 50 (user explicitly set it)
-	 *
-	 * @example
-	 * // Disable auto-adjustment
-	 * const customAnimator = new ScrollAnimator({
-	 *   mainClassName: 'custom',
-	 *   autoDetectTransform: false, // Disable auto-adjustment
-	 *   customStyles: `...`
-	 * })
-	 * // translateYvalue stays 100 (default)
-	 *
-	 * @example
-	 * // Multiple instances with different animations
-	 * const fadeAnimator = new ScrollAnimator({
-	 *   mainClassName: 'fade-in',
-	 *   customStyles: ({ mainClassName, visibleClassName }) => `
-	 *     .${mainClassName} {
-	 *       opacity: 0;
-	 *       transition: opacity 0.5s ease;
-	 *     }
-	 *     .${mainClassName}.${visibleClassName} {
-	 *       opacity: 1;
-	 *     }
-	 *   `
-	 * })
-	 *
-	 * const zoomAnimator = new ScrollAnimator({
-	 *   mainClassName: 'zoom-in',
-	 *   customStyles: ({ mainClassName, visibleClassName }) => `
-	 *     .${mainClassName} {
-	 *       opacity: 0;
-	 *       transform: scale(0.8);
-	 *       transition: all 0.6s ease;
-	 *     }
-	 *     .${mainClassName}.${visibleClassName} {
-	 *       opacity: 1;
-	 *       transform: scale(1);
-	 *     }
-	 *   `
-	 * })
-	 *
-	 * const defaultAnimator = new ScrollAnimator({
-	 *   mainClassName: 'slide-up'
-	 * })
-	 * // Each instance injects different CSS independently
 	 */
 	constructor(options = {}) {
 		// Store original user options to detect explicit values
@@ -1169,19 +1096,6 @@ class ScrollAnimator {
 	 * Single Page Applications (SPAs) where components are mounted/unmounted.
 	 *
 	 * @example
-	 * // React component cleanup
-	 * useEffect(() => {
-	 *   const animator = new ScrollAnimator()
-	 *   return () => animator.destroy() // Cleanup on unmount
-	 * }, [])
-	 *
-	 * @example
-	 * // Vue component cleanup
-	 * beforeUnmount() {
-	 *   this.animator.destroy()
-	 * }
-	 *
-	 * @example
 	 * // Manual cleanup
 	 * const animator = new ScrollAnimator()
 	 * // ... use animator ...
@@ -1251,22 +1165,10 @@ class ScrollAnimator {
 	 * - Restart observation with new element list
 	 *
 	 * @example
-	 * // After loading more content via AJAX
+	 * // After loading dynamic content
 	 * const animator = new ScrollAnimator()
-	 *
-	 * async function loadMoreContent() {
-	 *   const response = await fetch('/api/more-content')
-	 *   document.getElementById('content').innerHTML += await response.text()
-	 *   animator.refresh() // Re-scan for new elements
-	 * }
-	 *
-	 * @example
-	 * // After search/filter updates
-	 * searchInput.addEventListener('input', async (e) => {
-	 *   const results = await searchProducts(e.target.value)
-	 *   resultsContainer.innerHTML = renderResults(results)
-	 *   animator.refresh() // Observe new results
-	 * })
+	 * // ... load new content into DOM ...
+	 * animator.refresh() // Re-scan for new elements
 	 */
 	refresh() {
 		// Check if initialized
@@ -1326,21 +1228,8 @@ class ScrollAnimator {
 	 * - Temporarily disabling animations during video playback
 	 *
 	 * @example
-	 * // Pause during modal open
 	 * const animator = new ScrollAnimator()
-	 *
-	 * modal.addEventListener('open', () => {
-	 *   animator.pause()
-	 * })
-	 *
-	 * modal.addEventListener('close', () => {
-	 *   animator.resume()
-	 * })
-	 *
-	 * @example
-	 * // Pause during video playback
-	 * video.addEventListener('play', () => animator.pause())
-	 * video.addEventListener('pause', () => animator.resume())
+	 * animator.pause() // Temporarily stop observing new elements
 	 */
 	pause() {
 		// Check if already paused
@@ -1378,17 +1267,9 @@ class ScrollAnimator {
 	 *
 	 * @example
 	 * const animator = new ScrollAnimator()
-	 *
-	 * // Pause and resume
 	 * animator.pause()
 	 * // ... do something ...
 	 * animator.resume()
-	 *
-	 * @example
-	 * // Resume after modal closes
-	 * modal.addEventListener('close', () => {
-	 *   animator.resume()
-	 * })
 	 */
 	resume() {
 		// Check if not paused
@@ -1434,26 +1315,11 @@ class ScrollAnimator {
 	 * - NodeList
 	 *
 	 * @example
-	 * // Add single element
 	 * const animator = new ScrollAnimator()
 	 * const newElement = document.createElement('div')
 	 * newElement.classList.add('animate-on-scroll')
 	 * document.body.appendChild(newElement)
 	 * animator.addElements(newElement)
-	 *
-	 * @example
-	 * // Add multiple elements
-	 * const newElements = document.querySelectorAll('.dynamic-content')
-	 * animator.addElements(newElements)
-	 *
-	 * @example
-	 * // Real-time notification
-	 * socket.on('notification', (data) => {
-	 *   const notif = createNotification(data)
-	 *   notif.classList.add('animate-on-scroll')
-	 *   container.appendChild(notif)
-	 *   animator.addElements(notif)
-	 * })
 	 */
 	addElements(elements) {
 		// Normalize input to array
@@ -1522,23 +1388,9 @@ class ScrollAnimator {
 	 * - NodeList
 	 *
 	 * @example
-	 * // Remove single element
 	 * const animator = new ScrollAnimator()
 	 * const element = document.querySelector('.no-longer-animate')
 	 * animator.removeElements(element)
-	 *
-	 * @example
-	 * // Remove multiple elements
-	 * const elements = document.querySelectorAll('.already-seen')
-	 * animator.removeElements(elements)
-	 *
-	 * @example
-	 * // Remove before deleting from DOM
-	 * deleteButton.addEventListener('click', () => {
-	 *   const item = deleteButton.closest('.item')
-	 *   animator.removeElements(item)
-	 *   item.remove()
-	 * })
 	 */
 	removeElements(elements) {
 		// Normalize input to array
@@ -1632,12 +1484,6 @@ class ScrollAnimator {
 	 * @example
 	 * const animator = new ScrollAnimator()
 	 * console.log(animator.currentSpeed) // e.g., 1250
-	 *
-	 * @example
-	 * // Monitor scroll speed
-	 * setInterval(() => {
-	 *   console.log(`Speed: ${animator.currentSpeed} px/s`)
-	 * }, 1000)
 	 */
 	get currentSpeed() {
 		return this._scroll.currentSpeed
@@ -1651,13 +1497,7 @@ class ScrollAnimator {
 	 *
 	 * @example
 	 * const animator = new ScrollAnimator()
-	 * const elements = animator.observedElements
-	 * console.log(`Observing ${elements.length} elements`)
-	 *
-	 * @example
-	 * // Check if specific element is observed
-	 * const myElement = document.querySelector('.my-element')
-	 * const isObserved = animator.observedElements.includes(myElement)
+	 * console.log(`Observing ${animator.observedElements.length} elements`)
 	 */
 	get observedElements() {
 		return [...this._elements.nodeList]

@@ -1888,6 +1888,11 @@ npx puppeteer tests/scroll-animator-lifecycle-test.html
 
 MIT License - feel free to use in personal and commercial projects.
 
+## 👤 Author
+
+**Jensen SIU**
+- Website: [https://www.jensen-siu.net](https://www.jensen-siu.net)
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit issues or pull requests.
