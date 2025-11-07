@@ -57,7 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ✅ **Existing Tests Pass**: All 107 existing tests pass without modification
 - ✅ **Safe Upgrade**: Existing implementations continue to work exactly as before
 
-## [1.0.0] - 2024-XX-XX
+## [1.0.0] - 2024-10-09
 
 ### Added
 - Initial release of ScrollAnimator
