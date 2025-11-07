@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Self-Removal Feature Test</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		body {
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+			line-height: 1.6;
+			color: #333;
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			min-height: 300vh;
+			padding: 20px;
+		}
+
+		.container {
+			max-width: 1200px;
+			margin: 0 auto;
+		}
+
+		header {
+			background: white;
+			border-radius: 12px;
+			padding: 40px;
+			margin-bottom: 40px;
+			box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+			text-align: center;
+		}
+
+		header h1 {
+			color: #667eea;
+			margin-bottom: 10px;
+		}
+
+		header p {
+			color: #666;
+			font-size: 1.1rem;
+		}
+
+		.test-section {
+			background: white;
+			border-radius: 12px;
+			padding: 40px;
+			margin-bottom: 40px;
+			box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+		}
+
+		.test-section h2 {
+			color: #667eea;
+			margin-bottom: 20px;
+			padding-bottom: 10px;
+			border-bottom: 2px solid #667eea;
+		}
+
+		.test-section h3 {
+			color: #764ba2;
+			margin: 30px 0 15px 0;
+		}
+
+		.test-box {
+			background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+			color: white;
+			padding: 30px;
+			border-radius: 8px;
+			margin: 20px 0;
+			min-height: 100px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			text-align: center;
+			font-size: 1.2rem;
+			font-weight: bold;
+		}
+
+		.test-box.persistent {
+			background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+		}
+
+		.test-box.instant {
+			background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+		}
+
+		.instructions {
+			background: #e7f3ff;
+			border-left: 4px solid #007bff;
+			padding: 20px;
+			margin: 20px 0;
+			border-radius: 4px;
+		}
+
+		.instructions h4 {
+			color: #007bff;
+			margin-bottom: 10px;
+		}
+
+		.instructions ol {
+			padding-left: 20px;
+		}
+
+		.instructions li {
+			margin: 8px 0;
+		}
+
+		.debug-info {
+			background: #1e1e1e;
+			color: #d4d4d4;
+			padding: 20px;
+			border-radius: 8px;
+			font-family: 'Courier New', monospace;
+			font-size: 14px;
+			margin: 20px 0;
+			max-height: 400px;
+			overflow-y: auto;
+		}
+
+		.spacer {
+			height: 100vh;
+		}
+
+		code {
+			background: #f4f4f4;
+			padding: 2px 6px;
+			border-radius: 3px;
+			font-family: 'Courier New', monospace;
+			color: #e83e8c;
+		}
+
+		.badge {
+			display: inline-block;
+			padding: 4px 8px;
+			border-radius: 4px;
+			font-size: 0.85rem;
+			font-weight: bold;
+			margin-left: 10px;
+		}
+
+		.badge.self-remove {
+			background: #28a745;
+			color: white;
+		}
+
+		.badge.persistent {
+			background: #ffc107;
+			color: #333;
+		}
+
+		.badge.instant {
+			background: #17a2b8;
+			color: white;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<header>
+			<h1>🗑️ Self-Removal Feature Test</h1>
+			<p>Testing the modifierClassName self-removal functionality</p>
+			<p style="margin-top: 10px; font-size: 0.9rem; color: #999;">
+				Open DevTools Console (F12) to see debug messages
+			</p>
+		</header>
+
+		<div class="test-section">
+			<h2>📋 Test Instructions</h2>
+			<div class="instructions">
+				<h4>How to Test:</h4>
+				<ol>
+					<li>Open the browser DevTools Console (F12 or Cmd+Option+I)</li>
+					<li>Scroll down slowly to trigger animations</li>
+					<li>Watch for console messages: <code>🗑️ Self-removal</code> and <code>⚡ Instant reveal</code></li>
+					<li>After animations complete, inspect elements to verify cleanup</li>
+					<li>Elements with <span class="badge self-remove">SELF-REMOVE</span> should have NO classes or inline styles</li>
+					<li>Elements with <span class="badge persistent">PERSISTENT</span> should keep their classes</li>
+				</ol>
+			</div>
+
+			<h3>Expected Behavior:</h3>
+			<ul style="padding-left: 20px; margin-top: 10px;">
+				<li><strong>Self-removing elements:</strong> All classes removed (<code>animate-on-scroll</code>, <code>aos-visible</code>, <code>self-remove</code>) + inline styles removed</li>
+				<li><strong>Persistent elements:</strong> Keep <code>animate-on-scroll</code> and <code>aos-visible</code> classes</li>
+				<li><strong>Instant reveals:</strong> Elements above viewport get immediate cleanup with <code>⚡ Instant reveal</code> message</li>
+			</ul>
+		</div>
+
+		<!-- Test 1: Self-Removing Elements -->
+		<div class="test-section">
+			<h2>Test 1: Self-Removing Elements <span class="badge self-remove">SELF-REMOVE</span></h2>
+			<p>These elements should have complete cleanup after animation (no classes, no inline styles)</p>
+
+			<div class="test-box animate-on-scroll self-remove">
+				Self-Removing Box #1
+				<br><small>Inspect after animation: should have NO classes</small>
+			</div>
+
+			<div class="test-box animate-on-scroll self-remove">
+				Self-Removing Box #2
+				<br><small>Inspect after animation: should have NO classes</small>
+			</div>
+
+			<div class="test-box animate-on-scroll self-remove">
+				Self-Removing Box #3
+				<br><small>Inspect after animation: should have NO classes</small>
+			</div>
+		</div>
+
+		<!-- Test 2: Persistent Elements -->
+		<div class="test-section">
+			<h2>Test 2: Persistent Elements <span class="badge persistent">PERSISTENT</span></h2>
+			<p>These elements should keep their animation classes after animation</p>
+
+			<div class="test-box persistent animate-on-scroll">
+				Persistent Box #1
+				<br><small>Inspect after animation: should keep classes</small>
+			</div>
+
+			<div class="test-box persistent animate-on-scroll">
+				Persistent Box #2
+				<br><small>Inspect after animation: should keep classes</small>
+			</div>
+
+			<div class="test-box persistent animate-on-scroll">
+				Persistent Box #3
+				<br><small>Inspect after animation: should keep classes</small>
+			</div>
+		</div>
+
+		<!-- Test 3: Mixed Usage -->
+		<div class="test-section">
+			<h2>Test 3: Mixed Usage</h2>
+			<p>Alternating self-removing and persistent elements</p>
+
+			<div class="test-box animate-on-scroll self-remove">
+				Mixed #1 - Self-Remove <span class="badge self-remove">SELF-REMOVE</span>
+			</div>
+
+			<div class="test-box persistent animate-on-scroll">
+				Mixed #2 - Persistent <span class="badge persistent">PERSISTENT</span>
+			</div>
+
+			<div class="test-box animate-on-scroll self-remove">
+				Mixed #3 - Self-Remove <span class="badge self-remove">SELF-REMOVE</span>
+			</div>
+
+			<div class="test-box persistent animate-on-scroll">
+				Mixed #4 - Persistent <span class="badge persistent">PERSISTENT</span>
+			</div>
+		</div>
+
+		<!-- Test 4: Instant Reveal (Above Viewport) -->
+		<div class="test-section">
+			<h2>Test 4: Instant Reveal Test</h2>
+			<p>Scroll to the top of the page. The header element above should have been instantly revealed with cleanup.</p>
+			<div class="instructions">
+				<h4>Verification:</h4>
+				<ol>
+					<li>Check console for <code>⚡ Instant reveal</code> messages</li>
+					<li>Inspect the header element at the top of the page</li>
+					<li>It should have NO animation classes (was above viewport on load)</li>
+				</ol>
+			</div>
+		</div>
+
+		<div class="spacer"></div>
+
+		<!-- Footer -->
+		<div class="test-section">
+			<h2>✅ Test Completion Checklist</h2>
+			<div class="instructions">
+				<h4>Verify the following:</h4>
+				<ol>
+					<li>✅ Console shows <code>🗑️ Self-removal</code> messages for self-removing elements</li>
+					<li>✅ Console shows <code>⚡ Instant reveal</code> messages for above-viewport elements</li>
+					<li>✅ Self-removing elements have NO classes after animation</li>
+					<li>✅ Self-removing elements have NO inline styles after animation</li>
+					<li>✅ Persistent elements keep <code>animate-on-scroll</code> and <code>aos-visible</code> classes</li>
+					<li>✅ Mixed usage works correctly (some remove, some persist)</li>
+					<li>✅ No JavaScript errors in console</li>
+					<li>✅ All animations completed smoothly</li>
+				</ol>
+			</div>
+		</div>
+	</div>
+
+	<!-- Load ScrollAnimator -->
+	<script src="../scroll-animator.js"></script>
+
+	<!-- Initialize with self-removal feature -->
+	<script>
+		// Enable debug mode to see console messages
+		const animator = new ScrollAnimator({
+			debug: true,
+			modifierClassName: 'self-remove',
+			maxSpeed: 850,
+			minSpeed: 650
+		})
+
+		// Log initialization
+		console.log('%c🧪 Self-Removal Test Initialized', 'color: #667eea; font-size: 16px; font-weight: bold;')
+		console.log('%cConfiguration:', 'color: #764ba2; font-weight: bold;')
+		console.log('  modifierClassName:', animator._config.modifierClassName)
+		console.log('  debug:', animator._config.debug)
+		console.log('%cWatch for these messages:', 'color: #764ba2; font-weight: bold;')
+		console.log('  🗑️ Self-removal: Complete cleanup (normal animations)')
+		console.log('  ⚡ Instant reveal: Complete cleanup (instant reveals)')
+	</script>
+</body>
+</html>
+

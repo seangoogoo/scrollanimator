@@ -9,6 +9,7 @@ A lightweight, vanilla JavaScript class that creates smooth, speed-adaptive scro
 - **🚀 Speed-Adaptive Animations** - Automatically adjusts animation duration based on scroll speed
 - **🎨 Flexible CSS Injection** - Multiple patterns: default template, custom CSS, function-based, or external stylesheets
 - **⚡ Performance Optimized** - Built-in LCP (Largest Contentful Paint) optimization
+- **🗑️ Self-Removing Animations** - One-time animations with automatic cleanup (opt-in)
 - **🔧 Highly Configurable** - 15+ configuration options for fine-tuned control
 - **♻️ Memory Safe** - Comprehensive cleanup with `destroy()` method for SPA compatibility
 - **📦 Zero Dependencies** - Pure vanilla JavaScript, no external libraries required
@@ -288,6 +289,7 @@ Manual initialization is useful in specific scenarios:
 | `debug` | boolean | `false` | Enable debug mode with console logs and visual indicators |
 | `mainClassName` | string | `'animate-on-scroll'` | CSS class for elements to animate |
 | `visibleClassName` | string | `'aos-visible'` | CSS class added when element is visible |
+| `modifierClassName` | null\|string | `null` | Optional modifier class for self-removing animations (see Self-Removal Feature) |
 | `translateYvalue` | number | `100` | Y-axis translation in pixels (auto-adjusted for custom CSS) |
 | `optimizeLCP` | boolean | `false` | Remove animations from above-the-fold content |
 | `maxSpeed` | number | `850` | Max transition duration (ms) for slow scrolling |
@@ -301,6 +303,189 @@ Manual initialization is useful in specific scenarios:
 | `observerThreshold` | number | `0` | IntersectionObserver threshold (0-1) |
 | `customStyles` | null\|string\|Function | `null` | Custom CSS injection pattern (see Custom CSS section) |
 | `autoDetectTransform` | boolean | `true` | Auto-adjust translateYvalue for custom CSS |
+
+## 🗑️ Self-Removal Feature
+
+The self-removal feature allows you to create one-time animations that automatically clean up after completion, returning elements to a pristine state with no residual classes or inline styles.
+
+### Overview
+
+**What is Self-Removal?**
+
+When an element has both the `mainClassName` and `modifierClassName`, ScrollAnimator will automatically remove all animation-related classes and inline styles after the animation completes. This is perfect for:
+- One-time entrance animations
+- Landing page hero sections
+- Modal/dialog entrance effects
+- Elements that should animate once and never again
+
+**What Gets Removed:**
+- `mainClassName` (e.g., 'animate-on-scroll')
+- `visibleClassName` (e.g., 'aos-visible')
+- `modifierClassName` (e.g., 'self-remove')
+- Inline `transitionDuration` style
+- Inline `transitionDelay` style
+
+### Basic Usage
+
+```javascript
+// Enable self-removal feature
+const animator = new ScrollAnimator({
+    modifierClassName: 'self-remove'
+})
+```
+
+```html
+<!-- Element with self-removal -->
+<div class="animate-on-scroll self-remove">
+    This will animate once, then all classes and styles are removed
+</div>
+
+<!-- Normal element (no self-removal) -->
+<div class="animate-on-scroll">
+    This will animate and keep all classes
+</div>
+```
+
+**Before animation:**
+```html
+<div class="animate-on-scroll self-remove">Content</div>
+```
+
+**During animation:**
+```html
+<div class="animate-on-scroll aos-visible self-remove"
+     style="transition-duration: 850ms; transition-delay: 120ms;">
+    Content
+</div>
+```
+
+**After animation completes:**
+```html
+<div>Content</div>
+```
+
+### Configuration
+
+**Enable the feature:**
+```javascript
+const animator = new ScrollAnimator({
+    modifierClassName: 'self-remove'  // Any class name you prefer
+})
+```
+
+**Disable the feature (default):**
+```javascript
+const animator = new ScrollAnimator({
+    modifierClassName: null  // Feature disabled
+})
+```
+
+### Use Cases
+
+**1. Landing Page Hero**
+```javascript
+const animator = new ScrollAnimator({
+    modifierClassName: 'once'
+})
+```
+```html
+<section class="animate-on-scroll once hero">
+    <h1>Welcome to Our Site</h1>
+    <!-- Animates once on page load, then cleanup -->
+</section>
+```
+
+**2. Mixed Usage**
+```javascript
+const animator = new ScrollAnimator({
+    mainClassName: 'fade-in',
+    modifierClassName: 'self-remove'
+})
+```
+```html
+<!-- Self-removing: animates once -->
+<div class="fade-in self-remove">One-time animation</div>
+
+<!-- Persistent: can animate multiple times -->
+<div class="fade-in">Repeatable animation</div>
+```
+
+**3. Modal Entrance**
+```javascript
+const animator = new ScrollAnimator({
+    modifierClassName: 'cleanup'
+})
+```
+```html
+<dialog class="animate-on-scroll cleanup">
+    <h2>Modal Content</h2>
+    <!-- Animates on open, cleanup after -->
+</dialog>
+```
+
+### Edge Cases Handled
+
+The self-removal feature handles all edge cases automatically:
+
+**1. Instant Reveals**
+- Elements above viewport (already scrolled past)
+- LCP-optimized elements (above-the-fold)
+- Both get complete cleanup even with 0ms transitions
+
+**2. Multiple Transition Properties**
+- CSS transitions with multiple properties (opacity, transform)
+- Cleanup happens only once despite multiple `transitionend` events
+
+**3. Method Interactions**
+- `refresh()`: Self-removed elements won't be re-queried (no `mainClassName`)
+- `addElements()`: Can re-add elements if you manually restore `mainClassName`
+- `destroy()`: Safely handles already-cleaned elements
+- `pause()`/`resume()`: No conflicts with self-removal
+
+### Debug Mode
+
+Enable debug mode to see self-removal in action:
+
+```javascript
+const animator = new ScrollAnimator({
+    debug: true,
+    modifierClassName: 'self-remove'
+})
+```
+
+**Console output:**
+```
+🗑️ Self-removal: Complete cleanup of element (removed classes: 'animate-on-scroll', 'aos-visible', 'self-remove' + inline styles) <div>...</div>
+```
+
+**For instant reveals:**
+```
+⚡ Instant reveal: Complete cleanup of element (removed classes: 'animate-on-scroll', 'aos-visible', 'self-remove' + inline styles) <div>...</div>
+```
+
+### Best Practices
+
+**✅ DO:**
+- Use for one-time entrance animations
+- Use for landing page hero sections
+- Use for modal/dialog entrances
+- Mix self-removing and persistent elements
+- Choose descriptive modifier class names ('once', 'cleanup', 'self-remove')
+
+**❌ DON'T:**
+- Use for elements that need to re-animate on scroll
+- Use for infinite scroll content
+- Rely on classes being present after animation
+- Use with elements that need persistent animation state
+
+### Backward Compatibility
+
+The self-removal feature is **completely opt-in** and **backward compatible**:
+
+- Default: `modifierClassName: null` (feature disabled)
+- Existing code continues to work without changes
+- No breaking changes to existing animations
+- Elements without modifier class behave exactly as before
 
 ## 🎨 Custom CSS Patterns
 

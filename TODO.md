@@ -3,7 +3,7 @@
 - Check and find how to manage 'debug: true' with custom styles of type 'functions' or 'external' which should actually be buggy,
 - Enable 'will-change' tweak (true/false),
 - check how behave the 'will-change' injection in case of custom styles of type 'functions' or 'external',
-- Add a customzable ID to the injected stylesheet tag.
+- Add a customizable ID to the injected stylesheet tag.
 
 ## 🐛 Debug Mode Issue Investigation
 

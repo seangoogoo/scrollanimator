@@ -18,7 +18,10 @@ body {
 </style>
 <script src="./scroll-animator.js?v=1.0.0"></script>
 <script>
-const animator = new ScrollAnimator({ debug: true })
+const animator = new ScrollAnimator({
+    debug: true,
+    modifierClassName: 'self-remove'
+ })
 // console.log(animator._boundHandlers)
 // animator.init()
 // console.log(ScrollAnimator.clamp(150, 0, 100)) // 100
@@ -38,7 +41,7 @@ const animator = new ScrollAnimator({ debug: true })
         <section class="mb-12">
             <div class="flex flex-col md:flex-row gap-6 items-center">
                 <div class="md:w-1/2">
-                    <h2 class="text-4xl font-bold text-gray-900 mb-4 animate-on-scroll">Transform Your Digital Experience</h2>
+                    <h2 class="text-4xl font-bold text-gray-900 mb-4 animate-on-scroll self-remove">Transform Your Digital Experience</h2>
                     <p class="text-lg text-gray-600 mb-6 animate-on-scroll">Discover innovative solutions that empower your business to reach new heights. Our cutting-edge technology adapts to your needs.</p>
                     <button class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition animate-on-scroll">Get Started Today</button>
                 </div>

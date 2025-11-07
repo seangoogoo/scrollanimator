@@ -3,7 +3,7 @@
  *
  * @author Jensen SIU
  * @website https://www.jensen-siu.net
- * @version 1.0.0
+ * @version 1.0.1
  * @license MIT
  */
 
@@ -15,8 +15,15 @@
  * A class-based scroll animation system that dynamically adjusts animation
  * timing based on scroll speed, providing a natural and responsive user experience.
  *
+ * Features:
+ * - Speed-adaptive animations that respond to scroll velocity
+ * - LCP optimization for above-the-fold content
+ * - Self-removing animations for one-time effects
+ * - Customizable CSS injection or external stylesheets
+ * - Debug mode with visual indicators and performance metrics
+ *
  * @class ScrollAnimator
- * @version 1.0.0
+ * @version 1.0.1
  *
  * @example
  * // Basic usage with defaults
@@ -30,6 +37,12 @@
  *   maxScrollSpeed: 2000,
  *   optimizeLCP: true
  * })
+ *
+ * @example
+ * // Self-removing animations (cleanup after animation)
+ * const animator = new ScrollAnimator({
+ *   modifierClassName: 'self-remove'
+ * })
  */
 class ScrollAnimator {
 	/**
@@ -39,6 +52,7 @@ class ScrollAnimator {
 	 * @param {boolean} [options.debug=false] - Enable debug mode with console logs and visual indicators
 	 * @param {string} [options.mainClassName='animate-on-scroll'] - CSS class for elements to animate
 	 * @param {string} [options.visibleClassName='aos-visible'] - CSS class added when element is visible
+	 * @param {null|string} [options.modifierClassName=null] - Optional modifier class for self-removing animations. When present on an element (along with mainClassName), all animation classes and inline styles are removed after animation completes, returning the element to a pristine state. Set to null to disable (default).
 	 * @param {number} [options.translateYvalue=100] - Y-axis translation value in pixels. Auto-adjusted to 0 when using custom CSS (unless explicitly set)
 	 * @param {boolean} [options.optimizeLCP=false] - Optimize for Largest Contentful Paint by removing animations from above-the-fold content
 	 * @param {number} [options.maxSpeed=850] - Maximum transition duration in milliseconds (for slow scrolling)
@@ -95,6 +109,23 @@ class ScrollAnimator {
 	 *   visibleClassName: 'visible',
 	 *   customStyles: 'external'
 	 * })
+	 *
+	 * @example
+	 * // Self-removing animations (complete cleanup after animation)
+	 * const animator = new ScrollAnimator({
+	 *   modifierClassName: 'self-remove'
+	 * })
+	 * // HTML: <div class="animate-on-scroll self-remove">Content</div>
+	 * // After animation: <div>Content</div> (all classes and inline styles removed)
+	 *
+	 * @example
+	 * // Mixed usage: some elements self-remove, others persist
+	 * const animator = new ScrollAnimator({
+	 *   mainClassName: 'fade-in',
+	 *   modifierClassName: 'once'
+	 * })
+	 * // HTML: <div class="fade-in">Persists</div>
+	 * //       <div class="fade-in once">Self-removes</div>
 	 */
 	constructor(options = {}) {
 		// Store original user options to detect explicit values
@@ -105,6 +136,7 @@ class ScrollAnimator {
 			debug: false,
 			mainClassName: 'animate-on-scroll',
 			visibleClassName: 'aos-visible',
+			modifierClassName: null,
 			translateYvalue: 100,
 			optimizeLCP: false,
 			maxSpeed: 850,
@@ -229,6 +261,17 @@ class ScrollAnimator {
 			throw new Error('ScrollAnimator: visibleClassName must be a non-empty string')
 		}
 
+		// Validate modifierClassName if provided
+		if (this._config.modifierClassName !== null) {
+			if (typeof this._config.modifierClassName !== 'string') {
+				console.warn('ScrollAnimator: modifierClassName must be a string or null. Disabling self-removal feature.')
+				this._config.modifierClassName = null
+			} else if (this._config.modifierClassName.trim() === '') {
+				console.warn('ScrollAnimator: modifierClassName cannot be empty. Disabling self-removal feature.')
+				this._config.modifierClassName = null
+			}
+		}
+
 		// Validate customStyles if provided
 		if (this._config.customStyles !== null) {
 			const type = typeof this._config.customStyles
@@ -272,6 +315,60 @@ class ScrollAnimator {
 	 */
 	_getScrollY() {
 		return (document.scrollingElement || document.documentElement).scrollTop
+	}
+
+	/**
+	 * Performs complete cleanup for elements with the modifier class
+	 * @private
+	 * @param {HTMLElement} element - The element to clean up
+	 * @param {string} [context='animation'] - Context for debug logging ('animation' or 'instant')
+	 * @returns {boolean} True if cleanup was performed, false if element doesn't have modifierClassName
+	 *
+	 * @description
+	 * Removes all animation-related classes and inline styles from elements
+	 * that have the modifierClassName. This provides complete cleanup and
+	 * returns the element to a pristine state.
+	 *
+	 * **Removed classes:**
+	 * - mainClassName (e.g., 'animate-on-scroll')
+	 * - visibleClassName (e.g., 'aos-visible')
+	 * - modifierClassName (e.g., 'self-remove')
+	 *
+	 * **Removed inline styles:**
+	 * - transitionDuration
+	 * - transitionDelay
+	 *
+	 * **Edge cases handled:**
+	 * - Multiple transitionend events (guard check in caller)
+	 * - Instant reveals (0ms transitions)
+	 * - Elements already cleaned up (safe to call multiple times)
+	 *
+	 * **Called from:**
+	 * - transitionend event listener (normal animations)
+	 * - _revealElementsAboveViewport() (above viewport instant reveals)
+	 * - _optimizeAosForLcp() (LCP optimization instant reveals)
+	 */
+	_performSelfRemovalCleanup(element, context = 'animation') {
+		if (this._config.modifierClassName &&
+		    element.classList.contains(this._config.modifierClassName)) {
+
+			// Remove all animation-related classes
+			element.classList.remove(this._config.mainClassName)
+			element.classList.remove(this._config.visibleClassName)
+			element.classList.remove(this._config.modifierClassName)
+
+			// Remove all inline transition styles
+			element.style.transitionDuration = ''
+			element.style.transitionDelay = ''
+
+			if (this._config.debug) {
+				const contextLabel = context === 'instant' ? '⚡ Instant reveal' : '🗑️ Self-removal'
+				console.log(`${contextLabel}: Complete cleanup of element (removed classes: '${this._config.mainClassName}', '${this._config.visibleClassName}', '${this._config.modifierClassName}' + inline styles)`, element)
+			}
+
+			return true
+		}
+		return false
 	}
 
 	// ============================================================================
@@ -400,6 +497,9 @@ class ScrollAnimator {
 					element.style.outline = '1px solid red'
 				}
 
+				// Perform self-removal cleanup for instant reveals
+				this._performSelfRemovalCleanup(element, 'instant')
+
 			} else {
 				aosSelectorsArray.push(element)
 			}
@@ -446,6 +546,9 @@ class ScrollAnimator {
 				if (this._config.debug) {
 					element.style.outline = '1px solid green'
 				}
+
+				// Perform self-removal cleanup for instant reveals
+				this._performSelfRemovalCleanup(element, 'instant')
 
 			} else {
 				aosSelectorsArray.push(element)
@@ -510,6 +613,12 @@ class ScrollAnimator {
 					// Clean up after the transition
 					entry.target.addEventListener('transitionend', () => {
 						entry.target.style.willChange = ''
+
+						// Self-removal feature: complete cleanup when modifier class is present
+						// Guard check: only perform cleanup if mainClassName still exists (prevents duplicate cleanup on multiple transitionend events)
+						if (entry.target.classList.contains(this._config.mainClassName)) {
+							this._performSelfRemovalCleanup(entry.target, 'animation')
+						}
 					}, { once: true })
 				})
 
