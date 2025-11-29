@@ -5,7 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.1] - 2025-11-07
+## [1.0.2] - 2025-11-27
+
+ ### Added
+ - **Event Callbacks**: New `onTransitionStart` and `onTransitionEnd` configuration options
+   - `onTransitionStart(element)`: Fired when the element enters the viewport and the transition begins
+   - `onTransitionEnd(element)`: Fired when the CSS transition completes
+   - Supports all animation types including instant reveals and LCP optimization
+   - Provides access to the animated DOM element for custom logic (analytics, state updates, chaining)
+ - Updated documentation with "Event Callbacks" section and usage examples
+ - Updated JSDoc comments to include new callback parameters
+
+ ## [1.0.1] - 2025-11-07
 
 ### Added
 - **Self-Removal Feature**: New `modifierClassName` configuration option for automatic cleanup of animation classes and inline styles after animations complete
@@ -70,6 +81,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Memory-safe cleanup with `destroy()` method
 - Zero dependencies - pure vanilla JavaScript
 
+[1.0.2]: https://github.com/seangoogoo/scrollanimator/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/seangoogoo/scrollanimator/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/seangoogoo/scrollanimator/releases/tag/v1.0.0
 

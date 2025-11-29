@@ -3,7 +3,7 @@
  *
  * @author Jensen SIU
  * @website https://www.jensen-siu.net
- * @version 1.0.1
+ * @version 1.0.2
  * @license MIT
  */
 
@@ -18,12 +18,12 @@
  * Features:
  * - Speed-adaptive animations that respond to scroll velocity
  * - LCP optimization for above-the-fold content
+ * - Event callbacks for transition start and end
  * - Self-removing animations for one-time effects
  * - Customizable CSS injection or external stylesheets
  * - Debug mode with visual indicators and performance metrics
  *
  * @class ScrollAnimator
- * @version 1.0.1
  *
  * @example
  * // Basic usage with defaults
@@ -71,6 +71,8 @@ class ScrollAnimator {
 	 *   - `string`: Inject custom CSS string directly
 	 *   - `Function`: Call function with config object to generate CSS dynamically
 	 * @param {boolean} [options.autoDetectTransform=true] - Auto-adjust translateYvalue to 0 when using custom CSS (prevents viewport detection issues)
+	 * @param {Function|null} [options.onTransitionStart=null] - Callback function fired when the element enters the viewport and transition starts. Receives the element as argument.
+	 * @param {Function|null} [options.onTransitionEnd=null] - Callback function fired when the transition completes. Receives the element as argument.
 	 *
 	 * @example
 	 * // Basic usage with default animation
@@ -149,7 +151,9 @@ class ScrollAnimator {
 			observerRootMargin: '0px 0px 70px 0px',
 			observerThreshold: 0,
 			customStyles: null,
-			autoDetectTransform: true
+			autoDetectTransform: true,
+			onTransitionStart: null,
+			onTransitionEnd: null
 		}
 
 		// Merge user options with defaults
@@ -244,12 +248,12 @@ class ScrollAnimator {
 		// Validate min/max relationships
 		if (this._config.minSpeed > this._config.maxSpeed) {
 			console.warn('ScrollAnimator: minSpeed should be less than maxSpeed. Swapping values.')
-			;[this._config.minSpeed, this._config.maxSpeed] = [this._config.maxSpeed, this._config.minSpeed]
+				;[this._config.minSpeed, this._config.maxSpeed] = [this._config.maxSpeed, this._config.minSpeed]
 		}
 
 		if (this._config.minScrollSpeed > this._config.maxScrollSpeed) {
 			console.warn('ScrollAnimator: minScrollSpeed should be less than maxScrollSpeed. Swapping values.')
-			;[this._config.minScrollSpeed, this._config.maxScrollSpeed] = [this._config.maxScrollSpeed, this._config.minScrollSpeed]
+				;[this._config.minScrollSpeed, this._config.maxScrollSpeed] = [this._config.maxScrollSpeed, this._config.minScrollSpeed]
 		}
 
 		// Validate class names are non-empty strings
@@ -288,6 +292,17 @@ class ScrollAnimator {
 		if (typeof this._config.autoDetectTransform !== 'boolean') {
 			console.warn('ScrollAnimator: autoDetectTransform must be a boolean. Using default value (true).')
 			this._config.autoDetectTransform = true
+		}
+
+		// Validate callbacks
+		if (this._config.onTransitionStart !== null && typeof this._config.onTransitionStart !== 'function') {
+			console.warn('ScrollAnimator: onTransitionStart must be a function or null. Disabling callback.')
+			this._config.onTransitionStart = null
+		}
+
+		if (this._config.onTransitionEnd !== null && typeof this._config.onTransitionEnd !== 'function') {
+			console.warn('ScrollAnimator: onTransitionEnd must be a function or null. Disabling callback.')
+			this._config.onTransitionEnd = null
 		}
 	}
 
@@ -350,7 +365,7 @@ class ScrollAnimator {
 	 */
 	_performSelfRemovalCleanup(element, context = 'animation') {
 		if (this._config.modifierClassName &&
-		    element.classList.contains(this._config.modifierClassName)) {
+			element.classList.contains(this._config.modifierClassName)) {
 
 			// Remove all animation-related classes
 			element.classList.remove(this._config.mainClassName)
@@ -497,8 +512,18 @@ class ScrollAnimator {
 					element.style.outline = '1px solid red'
 				}
 
+				// Trigger start callback
+				if (this._config.onTransitionStart) {
+					this._config.onTransitionStart(element)
+				}
+
 				// Perform self-removal cleanup for instant reveals
 				this._performSelfRemovalCleanup(element, 'instant')
+
+				// Trigger end callback (immediate for instant reveal)
+				if (this._config.onTransitionEnd) {
+					this._config.onTransitionEnd(element)
+				}
 
 			} else {
 				aosSelectorsArray.push(element)
@@ -547,8 +572,18 @@ class ScrollAnimator {
 					element.style.outline = '1px solid green'
 				}
 
+				// Trigger start callback
+				if (this._config.onTransitionStart) {
+					this._config.onTransitionStart(element)
+				}
+
 				// Perform self-removal cleanup for instant reveals
 				this._performSelfRemovalCleanup(element, 'instant')
+
+				// Trigger end callback (immediate for instant reveal)
+				if (this._config.onTransitionEnd) {
+					this._config.onTransitionEnd(element)
+				}
 
 			} else {
 				aosSelectorsArray.push(element)
@@ -610,6 +645,11 @@ class ScrollAnimator {
 					// Add the configured visible class to trigger the CSS transition/animation
 					entry.target.classList.add(this._config.visibleClassName)
 
+					// Trigger start callback
+					if (this._config.onTransitionStart) {
+						this._config.onTransitionStart(entry.target)
+					}
+
 					// Clean up after the transition
 					entry.target.addEventListener('transitionend', () => {
 						entry.target.style.willChange = ''
@@ -618,6 +658,11 @@ class ScrollAnimator {
 						// Guard check: only perform cleanup if mainClassName still exists (prevents duplicate cleanup on multiple transitionend events)
 						if (entry.target.classList.contains(this._config.mainClassName)) {
 							this._performSelfRemovalCleanup(entry.target, 'animation')
+						}
+
+						// Trigger end callback
+						if (this._config.onTransitionEnd) {
+							this._config.onTransitionEnd(entry.target)
 						}
 					}, { once: true })
 				})
@@ -774,13 +819,17 @@ class ScrollAnimator {
 	_injectStyles() {
 		// Check for 'external' keyword - skip injection entirely
 		if (this._config.customStyles === 'external') {
-			console.info('ScrollAnimator: Using external CSS. No styles injected.')
+			if (this._config.debug) {
+				console.info('ScrollAnimator: Using external CSS. No styles injected.')
+			}
 			this._elements.styleElement = null
 
 			// Auto-adjust translateYvalue if enabled and not explicitly set
 			if (this._config.autoDetectTransform && !this._userOptions.hasOwnProperty('translateYvalue')) {
 				this._config.translateYvalue = 0
-				console.info('ScrollAnimator: translateYvalue auto-set to 0 for external CSS. Set explicitly to override.')
+				if (this._config.debug) {
+					console.info('ScrollAnimator: translateYvalue auto-set to 0 for external CSS. Set explicitly to override.')
+				}
 			}
 			return
 		}
@@ -807,7 +856,9 @@ class ScrollAnimator {
 			// Auto-adjust translateYvalue if enabled and not explicitly set
 			if (this._config.autoDetectTransform && !this._userOptions.hasOwnProperty('translateYvalue')) {
 				this._config.translateYvalue = 0
-				console.info('ScrollAnimator: translateYvalue auto-set to 0 for custom CSS. Set explicitly to override.')
+				if (this._config.debug) {
+					console.info('ScrollAnimator: translateYvalue auto-set to 0 for custom CSS. Set explicitly to override.')
+				}
 			}
 		} else {
 			// Use default template (null or 'template')
@@ -950,7 +1001,7 @@ class ScrollAnimator {
 
 		// Validate elements exist
 		if (this._elements.nodeList.length === 0) {
-			console.warn(`⚠️ ScrollAnimator: No elements found with class '.${this._config.mainClassName}'`)
+			if (this._config.debug) console.warn(`⚠️ ScrollAnimator: No elements found with class '.${this._config.mainClassName}'`)
 			return this
 		}
 
@@ -1123,7 +1174,7 @@ class ScrollAnimator {
 				document.querySelectorAll(`.${this._config.mainClassName}`)
 			)
 
-			if (this._elements.nodeList.length === 0) {
+			if (this._elements.nodeList.length === 0 && this._config.debug) {
 				console.warn(`⚠️ ScrollAnimator: No elements found with class '.${this._config.mainClassName}'`)
 				// Don't return - just log warning and continue
 			}
@@ -1302,7 +1353,7 @@ class ScrollAnimator {
 
 		// Validate elements exist
 		if (this._elements.nodeList.length === 0) {
-			console.warn(`⚠️ ScrollAnimator: No elements found with class '.${this._config.mainClassName}' after refresh`)
+			if (this._config.debug) console.warn(`⚠️ ScrollAnimator: No elements found with class '.${this._config.mainClassName}' after refresh`)
 			return this
 		}
 

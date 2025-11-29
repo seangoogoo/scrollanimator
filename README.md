@@ -9,7 +9,8 @@ A lightweight, vanilla JavaScript class that creates smooth, speed-adaptive scro
 - **🚀 Speed-Adaptive Animations** - Automatically adjusts animation duration based on scroll speed
 - **🎨 Flexible CSS Injection** - Multiple patterns: default template, custom CSS, function-based, or external stylesheets
 - **⚡ Performance Optimized** - Built-in LCP (Largest Contentful Paint) optimization
-- **🗑️ Self-Removing Animations** - One-time animations with automatic cleanup (opt-in)
+- **� Event Callbacks** - Hooks for transition start and end events
+- **�🗑️ Self-Removing Animations** - One-time animations with automatic cleanup (opt-in)
 - **🔧 Highly Configurable** - 15+ configuration options for fine-tuned control
 - **♻️ Memory Safe** - Comprehensive cleanup with `destroy()` method for SPA compatibility
 - **📦 Zero Dependencies** - Pure vanilla JavaScript, no external libraries required
@@ -303,6 +304,8 @@ Manual initialization is useful in specific scenarios:
 | `observerThreshold` | number | `0` | IntersectionObserver threshold (0-1) |
 | `customStyles` | null\|string\|Function | `null` | Custom CSS injection pattern (see Custom CSS section) |
 | `autoDetectTransform` | boolean | `true` | Auto-adjust translateYvalue for custom CSS |
+| `onTransitionStart` | Function\|null | `null` | Callback fired when transition starts |
+| `onTransitionEnd` | Function\|null | `null` | Callback fired when transition ends |
 
 ## 🗑️ Self-Removal Feature
 
@@ -486,6 +489,40 @@ The self-removal feature is **completely opt-in** and **backward compatible**:
 - Existing code continues to work without changes
 - No breaking changes to existing animations
 - Elements without modifier class behave exactly as before
+
+## 📡 Event Callbacks
+
+ScrollAnimator provides callbacks to hook into the animation lifecycle. This allows you to trigger custom JavaScript logic when animations start or end.
+
+### Available Callbacks
+
+| Callback | Arguments | Description |
+|----------|-----------|-------------|
+| `onTransitionStart` | `(element)` | Fired when the element enters the viewport and the transition begins. |
+| `onTransitionEnd` | `(element)` | Fired when the CSS transition completes. |
+
+### Usage Example
+
+```javascript
+const animator = new ScrollAnimator({
+    // Fired when animation starts (element becomes visible)
+    onTransitionStart: (element) => {
+        console.log('Animation started for:', element)
+        // Example: Play a sound, trigger analytics, etc.
+    },
+
+    // Fired when animation completes
+    onTransitionEnd: (element) => {
+        console.log('Animation ended for:', element)
+        // Example: Enable interactions, focus input, etc.
+        element.classList.add('animation-complete')
+    }
+})
+```
+
+### Notes
+- **Instant Reveals**: For elements that are revealed instantly (e.g., above the viewport or LCP optimized), both callbacks are fired immediately in sequence.
+- **Context**: The `element` argument provides access to the DOM element being animated.
 
 ## 🎨 Custom CSS Patterns
 

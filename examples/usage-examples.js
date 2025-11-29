@@ -1143,3 +1143,169 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 
+
+// ============================================================================
+// 9. ACTIVE DEMO PAGE LOGIC
+// ============================================================================
+// The following code powers the usage-examples.html page
+// ============================================================================
+
+const animators = []
+
+// 1. Basic Fade In (Automatic Init)
+const fadeAnimator = new ScrollAnimator({
+    mainClassName: 'fade-in',
+    customStyles: `
+        .fade-in {
+            opacity: 0;
+            transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .fade-in.aos-visible {
+            opacity: 1;
+        }
+    `
+})
+animators.push(fadeAnimator)
+
+// 2. Dynamic Slide Up (Automatic Init)
+const slideUpAnimator = new ScrollAnimator({
+    mainClassName: 'slide-up',
+    customStyles: ({ mainClassName }) => `
+        .${mainClassName} {
+            opacity: 0;
+            transform: translateY(100px) scale(0.95);
+            transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .${mainClassName}.aos-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    `
+})
+animators.push(slideUpAnimator)
+
+// 3. Elastic Zoom (Manual Init)
+const zoomAnimator = new ScrollAnimator({
+    mainClassName: 'zoom-in',
+    customStyles: `
+        .zoom-in {
+            opacity: 0;
+            transform: scale(0.5);
+            filter: blur(10px);
+            transition: all 0.8s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+        }
+        .zoom-in.aos-visible {
+            opacity: 1;
+            transform: scale(1);
+            filter: blur(0);
+        }
+    `
+})
+zoomAnimator.init()
+animators.push(zoomAnimator)
+
+// 4. Slide Left with Rotation (Manual Init)
+const slideLeftAnimator = new ScrollAnimator({
+    mainClassName: 'slide-left',
+    customStyles: `
+        .slide-left {
+            opacity: 0;
+            transform: translateX(-100px) rotate(-10deg);
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .slide-left.aos-visible {
+            opacity: 1;
+            transform: translateX(0) rotate(0);
+        }
+    `
+})
+slideLeftAnimator.init()
+animators.push(slideLeftAnimator)
+
+// 5. Callback Animator (New Feature)
+const callbackAnimator = new ScrollAnimator({
+    mainClassName: 'callback-anim',
+	delayMin: 240,
+    customStyles: `
+        .callback-anim {
+            opacity: 0;
+            transform: translateY(200px);
+            transition: all 0.6s ease-out;
+        }
+        .callback-anim.aos-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    `,
+    onTransitionStart: (element) => {
+        const status = element.querySelector('.callback-status')
+        const indicator = element.querySelector('.callback-indicator')
+        if (status) status.textContent = '🚀 Started'
+        if (indicator) indicator.style.background = '#f59e0b' // Amber
+        element.style.borderColor = '#f59e0b'
+    },
+    onTransitionEnd: (element) => {
+        const status = element.querySelector('.callback-status')
+        const indicator = element.querySelector('.callback-indicator')
+        if (status) status.textContent = '🏁 Ended'
+        if (indicator) indicator.style.background = '#10b981' // Emerald
+        element.style.borderColor = '#10b981'
+    }
+})
+callbackAnimator.init()
+animators.push(callbackAnimator)
+
+// Control Panel Logic
+window.addEventListener('DOMContentLoaded', () => {
+    const pauseBtn = document.getElementById('pauseBtn')
+    const resumeBtn = document.getElementById('resumeBtn')
+    const refreshBtn = document.getElementById('refreshBtn')
+    const addElementBtn = document.getElementById('addElementBtn')
+    const statusSpan = document.getElementById('status')
+    const elementCountSpan = document.getElementById('elementCount')
+
+    const updateCount = () => {
+        const total = animators.reduce((acc, anim) => acc + anim.observedElements.length, 0)
+        elementCountSpan.textContent = total
+    }
+
+    window.addEventListener('load', updateCount)
+
+    if (pauseBtn) {
+        pauseBtn.addEventListener('click', () => {
+            animators.forEach(a => a.pause())
+            statusSpan.textContent = 'Paused'
+            statusSpan.style.color = '#f87171'
+        })
+    }
+
+    if (resumeBtn) {
+        resumeBtn.addEventListener('click', () => {
+            animators.forEach(a => a.resume())
+            statusSpan.textContent = 'Active'
+            statusSpan.style.color = '#4ade80'
+        })
+    }
+
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+            animators.forEach(a => a.refresh())
+            updateCount()
+        })
+    }
+
+    let counter = 1
+    if (addElementBtn) {
+        addElementBtn.addEventListener('click', () => {
+            const container = document.getElementById('dynamicContent')
+            const el = document.createElement('div')
+            el.className = 'card fade-in dynamic-element'
+            el.innerHTML = `<h3>Dynamic Item ${counter++}</h3><p>Added dynamically to the DOM.</p>`
+            container.appendChild(el)
+
+            fadeAnimator.addElements([el])
+            updateCount()
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        })
+    }
+})

@@ -20,8 +20,9 @@ body {
 <script>
 const animator = new ScrollAnimator({
     debug: true,
+    delayMin: 40,
     modifierClassName: 'self-remove'
- })
+})
 // console.log(animator._boundHandlers)
 // animator.init()
 // console.log(ScrollAnimator.clamp(150, 0, 100)) // 100
