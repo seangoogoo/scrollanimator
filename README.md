@@ -297,7 +297,8 @@ Manual initialization is useful in specific scenarios:
 | `minSpeed` | number | `650` | Min transition duration (ms) for fast scrolling |
 | `delayMax` | number | `120` | Maximum delay between animations (ms) |
 | `delayMin` | number | `0` | Minimum delay between animations (ms) |
-| `delayStackTweak` | number | `0.5` | Delay multiplier (0-1) for staggered animations |
+| `delayStackTweak` | number | `1` | Multiplier (0-1) applied to the stagger delay |
+| `maxQueueDelay` | number | `400` | Maximum wait (ms) before an element starts, whatever the queue |
 | `maxScrollSpeed` | number | `1800` | Maximum scroll speed threshold (px/s) |
 | `minScrollSpeed` | number | `800` | Minimum scroll speed threshold (px/s) |
 | `observerRootMargin` | string | `'0px 0px 70px 0px'` | IntersectionObserver root margin |
@@ -1675,6 +1676,7 @@ animator.observedElements.forEach(element => {
 See comprehensive usage examples in:
 - **Interactive Demo**: `examples/usage-examples.html`
 - **Code Examples**: `examples/usage-examples.js`
+- **Scroll Bursts Stress Test**: `examples/glossary-stress-test.html` (glossary-like layout, live metrics; `?v=1.0.2` loads the previous version for comparison)
 
 Examples include:
 - Basic usage patterns

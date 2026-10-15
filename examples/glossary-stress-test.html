@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>ScrollAnimator - Glossary layout stress test</title>
+	<!--
+		Stress test for discontinuous scrolling (successive mouse-wheel / trackpad bursts).
+		Glossary-like layout: one letter per group, 3-column grid of cards, 149 animated elements.
+		?v=1.0.2 loads the pre-fix version (pinned commit on jsDelivr, needs network) to compare.
+	-->
+	<script>
+		window.__aosVersion = new URLSearchParams(location.search).get('v') === '1.0.2' ? '1.0.2' : 'current'
+		document.write('<script src="' + (window.__aosVersion === '1.0.2'
+			? 'https://cdn.jsdelivr.net/gh/seangoogoo/scrollanimator@3b43a0ccf0d16d337dbdb0b1c49a32969a03050d/scroll-animator.js'
+			: '../scroll-animator.js') + '"><\/script>')
+	</script>
+	<script>
+		window.animator = new ScrollAnimator({
+			modifierClassName: 'self-remove',
+			onTransitionEnd: element => element.classList.add('aos-done')
+		})
+	</script>
+	<style>
+		body { margin: 0; font: 16px/1.4 system-ui, sans-serif; color: #111 }
+		.nav { position: sticky; top: 0; z-index: 10; height: 70px; display: flex; align-items: center; padding: 0 24px; background: #fff; border-bottom: 1px solid #ccc }
+		main { max-width: 1180px; margin: 0 auto; padding: 0 24px 200px }
+		.hero { padding: 80px 0 40px; text-align: center }
+		.hero h1 { margin: 0 0 16px; font-size: 3.5rem }
+		.featured { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 80px }
+		.featured-card, .glossary-card { display: flex; flex-direction: column; gap: 8px; box-sizing: border-box; min-height: 100%; padding: 20px; border: 1px solid #bbb; border-radius: 12px; color: inherit; text-decoration: none }
+		.featured-card { min-height: 180px }
+		.glossary-index { display: grid; gap: 64px }
+		.glossary-group { display: grid; grid-template-columns: 80px minmax(0, 1fr); column-gap: 32px }
+		.glossary-group__heading { position: sticky; top: 100px; display: grid; place-items: center; width: 80px; height: 80px; margin: 0; border: 2px solid #111; border-radius: 32%; font-size: 2rem }
+		.glossary-group__definitions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; margin: 0; padding: 0; list-style: none }
+		@media (max-width: 900px) {
+			.glossary-group__definitions { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+			.featured { grid-template-columns: repeat(2, 1fr) }
+		}
+		@media (max-width: 600px) {
+			.glossary-group__definitions { grid-template-columns: 1fr }
+			.glossary-group__heading { position: relative; top: auto }
+		}
+		#hud { position: fixed; right: 12px; bottom: 12px; z-index: 20; padding: 10px 12px; border-radius: 8px; background: #111; color: #0f0; font: 12px/1.5 ui-monospace, monospace; white-space: pre }
+		#hud a { color: #ff0 }
+	</style>
+</head>
+<body>
+	<header class="nav">Navigation (placeholder)</header>
+	<main>
+		<section class="hero">
+			<h1 class="animate-on-scroll">Glossary</h1>
+			<p class="animate-on-scroll">Placeholder subtitle</p>
+		</section>
+		<h2 class="animate-on-scroll">Featured</h2>
+		<div class="featured">
+			<a class="featured-card animate-on-scroll" href="#"><strong>Featured topic 1</strong><span>Placeholder summary.</span></a>
+			<a class="featured-card animate-on-scroll" href="#"><strong>Featured topic 2</strong><span>Placeholder summary.</span></a>
+			<a class="featured-card animate-on-scroll" href="#"><strong>Featured topic 3</strong><span>Placeholder summary.</span></a>
+			<a class="featured-card animate-on-scroll" href="#"><strong>Featured topic 4</strong><span>Placeholder summary.</span></a>
+			<a class="featured-card animate-on-scroll" href="#"><strong>Featured topic 5</strong><span>Placeholder summary.</span></a>
+			<a class="featured-card animate-on-scroll" href="#"><strong>Featured topic 6</strong><span>Placeholder summary.</span></a>
+			<a class="featured-card animate-on-scroll" href="#"><strong>Featured topic 7</strong><span>Placeholder summary.</span></a>
+			<a class="featured-card animate-on-scroll" href="#"><strong>Featured topic 8</strong><span>Placeholder summary.</span></a>
+			<a class="featured-card animate-on-scroll" href="#"><strong>Featured topic 9</strong><span>Placeholder summary.</span></a>
+			<a class="featured-card animate-on-scroll" href="#"><strong>Featured topic 10</strong><span>Placeholder summary.</span></a>
+		</div>
+		<h2 class="animate-on-scroll">Index</h2>
+		<div class="glossary-index">
+			<section class="glossary-group">
+				<div class="glossary-group__letter animate-on-scroll"><h3 class="glossary-group__heading">A</h3></div>
+				<ul class="glossary-group__definitions">
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>A-jade zenith</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>A-delta ember grove</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>A-delta nexus</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>A-flux</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>A-anchor ember</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>A-flux</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>A-beacon delta harbor</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>A-delta</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>A-zenith delta orbit</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>A-index</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>A-anchor jade</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>A-harbor tensor lumen</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>A-mosaic</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+				</ul>
+			</section>
+			<section class="glossary-group">
+				<div class="glossary-group__letter animate-on-scroll"><h3 class="glossary-group__heading">B</h3></div>
+				<ul class="glossary-group__definitions">
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>B-grove ember</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>B-delta nexus fable</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>B-beacon umber drift</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>B-drift xenon tensor</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>B-lumen</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>B-prism flux tensor</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>B-fable vector cipher</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>B-ember harbor</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>B-anchor kernel vector</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>B-fable</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>B-cobalt ember</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>B-umber vector willow</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>B-fable drift ember</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>B-relay</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+				</ul>
+			</section>
+			<section class="glossary-group">
+				<div class="glossary-group__letter animate-on-scroll"><h3 class="glossary-group__heading">C</h3></div>
+				<ul class="glossary-group__definitions">
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-ember delta</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-tensor cipher signal</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-yield willow brava</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-willow kernel</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-harbor fable delta</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-signal</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-prism</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-zenith fable</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-kernel</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-zenith relay</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-beacon</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-relay anchor willow</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-yield orbit jade</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-lumen</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-orbit</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-orbit alpha fable</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-lumen quartz signal</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-jade</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-xenon umber</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-delta</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-zenith grove</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-zenith delta</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-ember</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>C-cipher</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+				</ul>
+			</section>
+			<section class="glossary-group">
+				<div class="glossary-group__letter animate-on-scroll"><h3 class="glossary-group__heading">D</h3></div>
+				<ul class="glossary-group__definitions">
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>D-harbor</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>D-delta grove</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>D-jade</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>D-grove xenon brava</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>D-nexus</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>D-yield jade quartz</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>D-xenon echo</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>D-harbor</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+				</ul>
+			</section>
+			<section class="glossary-group">
+				<div class="glossary-group__letter animate-on-scroll"><h3 class="glossary-group__heading">E</h3></div>
+				<ul class="glossary-group__definitions">
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>E-drift echo</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>E-tensor flux</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>E-grove</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>E-vector quartz echo</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>E-kernel brava nexus</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>E-xenon jade brava</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>E-tensor flux quartz</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+				</ul>
+			</section>
+			<section class="glossary-group">
+				<div class="glossary-group__letter animate-on-scroll"><h3 class="glossary-group__heading">F</h3></div>
+				<ul class="glossary-group__definitions">
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>F-xenon kernel willow</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>F-vector</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>F-orbit mosaic prism</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>F-orbit mosaic</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>F-fable willow brava</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>F-relay</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>F-quartz mosaic</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>F-willow cipher xenon</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>F-orbit</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+				</ul>
+			</section>
+			<section class="glossary-group">
+				<div class="glossary-group__letter animate-on-scroll"><h3 class="glossary-group__heading">G</h3></div>
+				<ul class="glossary-group__definitions">
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>G-orbit</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>G-mosaic vector</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>G-echo</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>G-alpha echo willow</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>G-flux harbor yield</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>G-mosaic echo lumen</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>G-vector flux</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>G-zenith drift flux</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>G-kernel index brava</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>G-drift</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+				</ul>
+			</section>
+			<section class="glossary-group">
+				<div class="glossary-group__letter animate-on-scroll"><h3 class="glossary-group__heading">H</h3></div>
+				<ul class="glossary-group__definitions">
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>H-jade echo willow</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+				</ul>
+			</section>
+			<section class="glossary-group">
+				<div class="glossary-group__letter animate-on-scroll"><h3 class="glossary-group__heading">I</h3></div>
+				<ul class="glossary-group__definitions">
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>I-index</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>I-alpha</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+				</ul>
+			</section>
+			<section class="glossary-group">
+				<div class="glossary-group__letter animate-on-scroll"><h3 class="glossary-group__heading">K</h3></div>
+				<ul class="glossary-group__definitions">
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>K-grove index beacon</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+				</ul>
+			</section>
+			<section class="glossary-group">
+				<div class="glossary-group__letter animate-on-scroll"><h3 class="glossary-group__heading">L</h3></div>
+				<ul class="glossary-group__definitions">
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>L-nexus</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+				</ul>
+			</section>
+			<section class="glossary-group">
+				<div class="glossary-group__letter animate-on-scroll"><h3 class="glossary-group__heading">M</h3></div>
+				<ul class="glossary-group__definitions">
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>M-quartz</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>M-signal</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>M-prism umber quartz</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>M-anchor index delta</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>M-willow drift anchor</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>M-index jade brava</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>M-lumen alpha</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>M-lumen</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>M-echo</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>M-harbor delta umber</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+				</ul>
+			</section>
+			<section class="glossary-group">
+				<div class="glossary-group__letter animate-on-scroll"><h3 class="glossary-group__heading">N</h3></div>
+				<ul class="glossary-group__definitions">
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>N-echo grove delta</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>N-mosaic</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>N-cobalt grove</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+				</ul>
+			</section>
+			<section class="glossary-group">
+				<div class="glossary-group__letter animate-on-scroll"><h3 class="glossary-group__heading">P</h3></div>
+				<ul class="glossary-group__definitions">
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>P-cipher brava ember</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+				</ul>
+			</section>
+			<section class="glossary-group">
+				<div class="glossary-group__letter animate-on-scroll"><h3 class="glossary-group__heading">S</h3></div>
+				<ul class="glossary-group__definitions">
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>S-umber mosaic</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>S-relay cipher echo</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>S-prism quartz mosaic</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>S-index anchor</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>S-zenith</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>S-umber ember</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>S-prism beacon ember</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>S-tensor</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+				</ul>
+			</section>
+			<section class="glossary-group">
+				<div class="glossary-group__letter animate-on-scroll"><h3 class="glossary-group__heading">T</h3></div>
+				<ul class="glossary-group__definitions">
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>T-jade</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>T-xenon jade quartz</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>T-drift</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+				</ul>
+			</section>
+			<section class="glossary-group">
+				<div class="glossary-group__letter animate-on-scroll"><h3 class="glossary-group__heading">V</h3></div>
+				<ul class="glossary-group__definitions">
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>V-grove</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+				</ul>
+			</section>
+			<section class="glossary-group">
+				<div class="glossary-group__letter animate-on-scroll"><h3 class="glossary-group__heading">Z</h3></div>
+				<ul class="glossary-group__definitions">
+					<li><a class="glossary-card animate-on-scroll self-remove" href="#"><strong>Z-fable kernel</strong><span>Placeholder definition text, about two lines long to match a typical card height.</span></a></li>
+				</ul>
+			</section>
+		</div>
+	</main>
+	<div id="hud"></div>
+	<script>
+		// Live metrics: max assigned delay, pending/running transitions, out-of-order starts (scrolling down), idle time
+		(() => {
+			const hud = document.getElementById('hud')
+			const otherVersion = window.__aosVersion === '1.0.2' ? '?v=current' : '?v=1.0.2'
+			let maxDelay = 0, pending = 0, running = 0, outOfOrder = 0, lastStartY = -Infinity, lastScroll = performance.now()
+
+			new MutationObserver(mutations => mutations.forEach(mutation => {
+				maxDelay = Math.max(maxDelay, parseFloat(mutation.target.style.transitionDelay) || 0)
+			})).observe(document.body, { subtree: true, attributes: true, attributeFilter: ['style'] })
+
+			document.addEventListener('transitionrun', event => { if (event.propertyName === 'opacity') pending++ })
+			document.addEventListener('transitionstart', event => {
+				if (event.propertyName !== 'opacity') return
+				pending--
+				running++
+				const y = event.target.getBoundingClientRect().top + scrollY
+				// 20px tolerance: cards of one row differ by a few px while their transform is starting
+				if (y < lastStartY - 20) outOfOrder++
+				lastStartY = y
+			})
+			document.addEventListener('transitionend', event => { if (event.propertyName === 'opacity') running-- })
+			addEventListener('scroll', () => { lastScroll = performance.now() }, { passive: true })
+
+			const tick = () => {
+				hud.innerHTML = `version: ${window.__aosVersion}  <a href="${otherVersion}">switch</a>\n` +
+					`max assigned delay: ${maxDelay} ms\n` +
+					`pending: ${pending}  running: ${running}\n` +
+					`out-of-order starts: ${outOfOrder}\n` +
+					`idle for: ${((performance.now() - lastScroll) / 1000).toFixed(1)} s`
+				requestAnimationFrame(tick)
+			}
+			tick()
+		})()
+	</script>
+</body>
+</html>

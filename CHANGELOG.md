@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-10-15
+
+### Fixed
+- Animations piling up during discontinuous wheel/trackpad scrolling, causing a long empty viewport at the bottom of the page
+- Later animation groups starting before earlier ones (order inversions)
+- Scroll speed measurement resetting to the slowest value after every pause instead of staying smooth
+
+### Added
+- `maxQueueDelay` configuration option to cap how long an element waits before starting, whatever the queue
+- Instant reveal of elements skipped above the viewport (e.g. after a fast scroll jump)
+
+### Changed
+- `delayStackTweak` now scales the stagger delay as documented; default changed from `0.5` to `1`
+- Elements visible on page load (top or restored scroll position) appear one by one with a constant `delayMax` stagger, not capped by `maxQueueDelay`; elements entering during this cascade wait for its end
+
 ## [1.0.2] - 2025-11-27
 
  ### Added
@@ -81,6 +96,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Memory-safe cleanup with `destroy()` method
 - Zero dependencies - pure vanilla JavaScript
 
+[1.1.0]: https://github.com/seangoogoo/scrollanimator/compare/v1.0.2...v1.1.0
 [1.0.2]: https://github.com/seangoogoo/scrollanimator/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/seangoogoo/scrollanimator/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/seangoogoo/scrollanimator/releases/tag/v1.0.0

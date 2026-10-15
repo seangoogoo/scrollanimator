@@ -3,11 +3,18 @@
  *
  * @author Jensen SIU
  * @website https://www.jensen-siu.net
- * @version 1.0.2
+ * @version 1.1.0
  * @license MIT
  */
 
 'use strict'
+
+// Gap (ms) without scroll measurement after which a new scroll gesture is assumed:
+// the first sample of a gesture spans the idle time and is not a speed
+const SCROLL_IDLE_GAP = 150
+
+// Weight (0-1) of each new sample in the smoothed scroll speed
+const SPEED_SMOOTHING = 0.3
 
 /**
  * ScrollAnimator - Speed Adaptive Scroll Animation
@@ -59,7 +66,8 @@ class ScrollAnimator {
 	 * @param {number} [options.minSpeed=650] - Minimum transition duration in milliseconds (for fast scrolling)
 	 * @param {number} [options.delayMax=120] - Maximum delay between animations in milliseconds
 	 * @param {number} [options.delayMin=0] - Minimum delay between animations in milliseconds
-	 * @param {number} [options.delayStackTweak=0.5] - Delay stack multiplier (0-1) for staggered animations
+	 * @param {number} [options.delayStackTweak=1] - Multiplier (0-1) applied to the stagger delay between consecutive animations
+	 * @param {number} [options.maxQueueDelay=400] - Maximum delay (ms) an element waits for the previous ones before its transition starts
 	 * @param {number} [options.maxScrollSpeed=1800] - Maximum scroll speed threshold in px/s
 	 * @param {number} [options.minScrollSpeed=800] - Minimum scroll speed threshold in px/s
 	 * @param {string} [options.observerRootMargin='0px 0px 70px 0px'] - IntersectionObserver root margin for early/late triggering
@@ -145,7 +153,8 @@ class ScrollAnimator {
 			minSpeed: 650,
 			delayMax: 120,
 			delayMin: 0,
-			delayStackTweak: 0.5,
+			delayStackTweak: 1,
+			maxQueueDelay: 400,
 			maxScrollSpeed: 1800,
 			minScrollSpeed: 800,
 			observerRootMargin: '0px 0px 70px 0px',
@@ -178,7 +187,9 @@ class ScrollAnimator {
 			currentDelay: this._config.delayMax,
 			delayMax: this._config.delayMax,
 			delayMin: this._config.delayMin,
-			delayStack: 0,
+			nextStartAt: 0,
+			isInitialBatch: false,
+			initialCascadeEnd: 0,
 			delayStackTweak: this._config.delayStackTweak,
 			maxScrollSpeed: this._config.maxScrollSpeed,
 			minScrollSpeed: this._config.minScrollSpeed,
@@ -200,9 +211,8 @@ class ScrollAnimator {
 			endTimer: null
 		}
 
-		// Initialize observer and timer references
+		// Initialize observer reference
 		this._observer = null
-		this._intersectionObserverEndTimer = null
 
 		// Initialize bound event handlers storage
 		this._boundHandlers = {}
@@ -229,7 +239,7 @@ class ScrollAnimator {
 		// Validate numeric values are positive
 		const numericFields = [
 			'translateYvalue', 'maxSpeed', 'minSpeed', 'delayMax', 'delayMin',
-			'maxScrollSpeed', 'minScrollSpeed', 'observerThreshold'
+			'maxQueueDelay', 'maxScrollSpeed', 'minScrollSpeed', 'observerThreshold'
 		]
 
 		numericFields.forEach(field => {
@@ -437,9 +447,14 @@ class ScrollAnimator {
 		const deltaTime = now - this._scroll.lastTime
 		const deltaY = Math.abs(currentScrollTop - this._scroll.lastTopPos)
 
-		if ((deltaTime > 0 && deltaY > 0) || isFinalCall) {
-
-			this._scroll.currentSpeed = Math.round(deltaY / deltaTime * 1000) // px/s
+		// The end-of-scroll call and the first sample after an idle gap measure the
+		// pause, not the scroll: they only refresh the reference values below
+		if (!isFinalCall && deltaTime > 0 && deltaTime <= SCROLL_IDLE_GAP && deltaY > 0) {
+			const rawSpeed = deltaY / deltaTime * 1000
+			const previousSpeed = this._scroll.currentSpeed
+			this._scroll.currentSpeed = Math.round(previousSpeed === 0
+				? rawSpeed
+				: ScrollAnimator.lerp(previousSpeed, rawSpeed, SPEED_SMOOTHING))
 
 			const scrollTransitionDuration = this._transitionValueCalculator(this._scroll.currentSpeed, 'duration')
 			this._transition.currentSpeed = scrollTransitionDuration
@@ -447,34 +462,61 @@ class ScrollAnimator {
 			const scrollTransitionDelay = this._transitionValueCalculator(this._scroll.currentSpeed, 'delay')
 			this._transition.currentDelay = scrollTransitionDelay
 
-			if (this._config.debug && this._scroll.currentSpeed > this._scroll.maxSpeed) {
-				this._scroll.maxSpeed = this._scroll.currentSpeed
-			}
-
-			if (this._config.debug && (this._transition.minDelayReported === null || this._transition.minDelayReported > scrollTransitionDelay)) {
-				this._transition.minDelayReported = scrollTransitionDelay
-			}
-
 			if (this._config.debug) {
+				if (this._scroll.currentSpeed > this._scroll.maxSpeed) {
+					this._scroll.maxSpeed = this._scroll.currentSpeed
+				}
 
-				const speedReport = `Distance traveled in pixels: ${deltaY}\nsince ${deltaTime.toFixed(2)}ms (Previous RAF differential)\nSpeed: ${this._scroll.currentSpeed}px/s\nMax speed: ${this._scroll.maxSpeed}px/s\nTransition duration: ${scrollTransitionDuration}ms\nDelay duration: ${scrollTransitionDelay}ms\nMin delay duration: ${this._transition.minDelayReported}ms`
+				if (this._transition.minDelayReported === null || this._transition.minDelayReported > scrollTransitionDelay) {
+					this._transition.minDelayReported = scrollTransitionDelay
+				}
+
+				const speedReport = `Distance traveled in pixels: ${deltaY}\nsince ${deltaTime.toFixed(2)}ms (Previous RAF differential)\nSpeed (smoothed): ${this._scroll.currentSpeed}px/s\nMax speed: ${this._scroll.maxSpeed}px/s\nTransition duration: ${scrollTransitionDuration}ms\nDelay duration: ${scrollTransitionDelay}ms\nMin delay duration: ${this._transition.minDelayReported}ms`
 
 				console.log(`${deltaY}px - currentScrollTop: ${currentScrollTop} - lastTopPos: ${this._scroll.lastTopPos}`)
-				if (isFinalCall) {
-					console.log("✅ Final speed after scroll:", this._scroll.currentSpeed, "px/s - transition duration:", scrollTransitionDuration, "ms - transition delay:", scrollTransitionDelay, "ms")
-				} else {
-					console.log("🔄 Speed during scroll:", this._scroll.currentSpeed, "px/s - transition duration:", scrollTransitionDuration, "ms - transition delay:", scrollTransitionDelay, "ms")
-				}
+				console.log("🔄 Speed during scroll:", this._scroll.currentSpeed, "px/s - transition duration:", scrollTransitionDuration, "ms - transition delay:", scrollTransitionDelay, "ms")
 				console.log("speedReport:", speedReport)
 
 				if (this._elements.debugWindow) {
 					this._elements.debugWindow.innerHTML = speedReport.replace(/\n/g, "<br>")
 				}
 			}
+		} else if (this._config.debug && isFinalCall) {
+			console.log("✅ Scroll ended, keeping speed:", this._scroll.currentSpeed, "px/s - transition duration:", this._transition.currentSpeed, "ms - transition delay:", this._transition.currentDelay, "ms")
+		}
 
-			// Update time and position reference values
-			this._scroll.lastTopPos = currentScrollTop
-			this._scroll.lastTime = now
+		// Update time and position reference values
+		this._scroll.lastTopPos = currentScrollTop
+		this._scroll.lastTime = now
+	}
+
+	/**
+	 * Reveals an element immediately, without transition
+	 *
+	 * @private
+	 * @param {HTMLElement} element - Element to reveal
+	 * @param {string} debugColor - Outline color used in debug mode
+	 *
+	 * @description
+	 * Fires onTransitionStart, self-removal cleanup and onTransitionEnd synchronously.
+	 */
+	_revealInstantly(element, debugColor) {
+		element.style.transitionDuration = `0ms`
+		element.style.transitionDelay = `0ms`
+		element.classList.add(this._config.visibleClassName)
+
+		if (this._config.debug) {
+			element.style.outline = `1px solid ${debugColor}`
+		}
+
+		if (this._config.onTransitionStart) {
+			this._config.onTransitionStart(element)
+		}
+
+		this._performSelfRemovalCleanup(element, 'instant')
+
+		if (this._config.onTransitionEnd) {
+			this._config.onTransitionEnd(element)
 		}
 	}
 
@@ -503,28 +545,7 @@ class ScrollAnimator {
 			const elementRect = element.getBoundingClientRect()
 
 			if (elementRect.bottom < 0) {
-
-				element.style.transitionDuration = `0ms`
-				element.style.transitionDelay = `0ms`
-				element.classList.add(this._config.visibleClassName)
-
-				if (this._config.debug) {
-					element.style.outline = '1px solid red'
-				}
-
-				// Trigger start callback
-				if (this._config.onTransitionStart) {
-					this._config.onTransitionStart(element)
-				}
-
-				// Perform self-removal cleanup for instant reveals
-				this._performSelfRemovalCleanup(element, 'instant')
-
-				// Trigger end callback (immediate for instant reveal)
-				if (this._config.onTransitionEnd) {
-					this._config.onTransitionEnd(element)
-				}
-
+				this._revealInstantly(element, 'red')
 			} else {
 				aosSelectorsArray.push(element)
 			}
@@ -563,28 +584,7 @@ class ScrollAnimator {
 			// Add the adjustment value translateYvalue which corresponds to the element's
 			// position before the element undergoes the transition
 			if (elementRect.top - this._config.translateYvalue < viewportHeight) {
-
-				element.style.transitionDuration = `0ms`
-				element.style.transitionDelay = `0ms`
-				element.classList.add(this._config.visibleClassName)
-
-				if (this._config.debug) {
-					element.style.outline = '1px solid green'
-				}
-
-				// Trigger start callback
-				if (this._config.onTransitionStart) {
-					this._config.onTransitionStart(element)
-				}
-
-				// Perform self-removal cleanup for instant reveals
-				this._performSelfRemovalCleanup(element, 'instant')
-
-				// Trigger end callback (immediate for instant reveal)
-				if (this._config.onTransitionEnd) {
-					this._config.onTransitionEnd(element)
-				}
-
+				this._revealInstantly(element, 'green')
 			} else {
 				aosSelectorsArray.push(element)
 			}
@@ -606,36 +606,47 @@ class ScrollAnimator {
 	 *
 	 * @description
 	 * Handles the animation triggering for elements entering the viewport:
-	 * - Accumulates delays for sequential animation (delayStack)
+	 * - Reveals instantly elements skipped above the viewport (fast jump, no intersection)
+	 * - Schedules staggered starts on a real-time queue (nextStartAt): elapsed time
+	 *   is deducted, start order follows processing order, waits are capped by maxQueueDelay
+	 * - First callback after init(): elements visible on load appear one by one with a
+	 *   constant delayMax stagger, uncapped; later elements wait for the end of this cascade
 	 * - Applies transition duration and delay based on current scroll speed
 	 * - Uses willChange for performance optimization
 	 * - Unobserves elements after animation starts
-	 * - Resets batch counters after all elements in a batch are processed
 	 */
 	_aosSelectorsManager(entries, observer) {
+		const isInitialBatch = this._transition.isInitialBatch
+		this._transition.isInitialBatch = false
+
 		entries.forEach(entry => {
+			// Jumped over without ever intersecting: reveal it like elements above the viewport at init
+			if (!entry.isIntersecting && entry.boundingClientRect.bottom < 0) {
+				this._revealInstantly(entry.target, 'red')
+				observer.unobserve(entry.target)
+				return
+			}
+
 			if (entry.isIntersecting) {
 
-				// Adds up successive delay durations that themselves depend on scroll speed
-				// This value is reset as soon as this total duration has elapsed,
-				// that is, as soon as the entire batch of selectors has finished its transitions
-				// => Allows us to avoid counting occurrences
-				this._transition.delayStack += this._transition.currentDelay
+				// Start no earlier than the previous scheduled start + stagger, never wait more than
+				// maxQueueDelay, except behind the initial cascade (keeps the on-screen order)
+				const now = performance.now()
+				const backlog = Math.max(0, this._transition.nextStartAt - now)
+				const maxWait = Math.max(this._config.maxQueueDelay, this._transition.initialCascadeEnd - now)
+				const delay = Math.round(isInitialBatch ? backlog : Math.min(backlog, maxWait))
+				const stagger = isInitialBatch ? this._config.delayMax : this._transition.currentDelay
+				this._transition.nextStartAt = now + delay + stagger * this._transition.delayStackTweak
+				if (isInitialBatch) this._transition.initialCascadeEnd = now + delay
 				this._transition.batchItemNb++
 
 				if (this._config.debug) {
-					if (this._transition.batchItemNb === 1) {
-						console.timeLog('ScrollAnimator', 'aosSelectorsManager batch start')
-					}
-
-					entry.target.dataset.info = `${this._transition.batchItemNb} | transition duration: ${this._transition.currentSpeed}ms, item delay: ${this._transition.currentDelay}ms, total delay: ${this._transition.delayStack}ms`
-
-					// Adaptive delay based on event frequency
-					console.log(`${this._transition.batchItemNb} | aosSelectorsManager ~ delayStack: `, this._transition.delayStack, "adjusted delayStack: ", Math.round(this._transition.delayStack * this._transition.delayStackTweak))
+					entry.target.dataset.info = `${this._transition.batchItemNb} | transition duration: ${this._transition.currentSpeed}ms, item delay: ${this._transition.currentDelay}ms, start delay: ${delay}ms`
+					console.log(`${this._transition.batchItemNb} | aosSelectorsManager ~ start delay: `, delay)
 				}
 
 				entry.target.style.transitionDuration = `${this._transition.currentSpeed}ms`
-				entry.target.style.transitionDelay = `${this._transition.delayStack}ms`
+				entry.target.style.transitionDelay = `${delay}ms`
 
 				// Prepare the transition a bit beforehand
 				entry.target.style.willChange = 'transform, opacity'
@@ -668,17 +679,6 @@ class ScrollAnimator {
 				})
 
 				observer.unobserve(entry.target)
-
-				// Debouncer to detect the last element of the batch processed by the intersectionObserver
-				clearTimeout(this._intersectionObserverEndTimer)
-				this._intersectionObserverEndTimer = setTimeout(() => {
-					if (this._config.debug) {
-						console.log(`🏁 Intersection observation finished - Resetting element counter - observed Item(s): ${this._transition.batchItemNb}`)
-						console.timeLog('ScrollAnimator', 'aosSelectorsManager batch ended')
-					}
-					this._transition.batchItemNb = 0
-					this._transition.delayStack = 0
-				}, Math.round(this._transition.delayStack * this._transition.delayStackTweak))
 
 			}
 		})
@@ -1018,6 +1018,9 @@ class ScrollAnimator {
 			this._elements.nodeList = this._optimizeAosForLcp(this._elements.nodeList)
 		}
 
+		// The first observer callback reveals the on-screen elements as a regular cascade
+		this._transition.isInitialBatch = true
+
 		// Handle elements above viewport if page is scrolled
 		if (this._scroll.lastTopPos > 0) {
 			if (this._config.debug) {
@@ -1270,7 +1273,6 @@ class ScrollAnimator {
 
 		// 2. Clear all timers
 		clearTimeout(this._scrollListener.endTimer)
-		clearTimeout(this._intersectionObserverEndTimer)
 
 		// 3. Remove event listeners
 		this._detachEventListeners()
